@@ -4,9 +4,19 @@ import './SearchBar.css';
 
 const GRADE_LESSONS = {
   "Tüm Sınıflar": ["Tüm Dersler"],
-  "İlkokul (1-4)": ["Tüm Dersler", "Türkçe", "Matematik", "Hayat Bilgisi", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "Diğer"],
-  "Ortaokul (5-8)": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "T.C. İnkılap Tarihi", "İngilizce", "Din Kültürü", "Bilişim", "Diğer"],
-  "Lise (9-12)": ["Tüm Dersler", "Türk Dili ve Edebiyatı", "Tarih", "Coğrafya", "Felsefe Grubu", "Matematik", "Fizik", "Kimya", "Biyoloji", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
+  "Okul Öncesi": ["Tüm Dersler", "Oyun ve Etkinlik", "Boyama", "Masal / Hikaye", "Diğer"],
+  "1. Sınıf": ["Tüm Dersler", "Okuma Yazma Öğreniyorum", "Matematik", "Hayat Bilgisi", "Müzik", "Görsel Sanatlar", "Beden Eğitimi", "Diğer"],
+  "2. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Hayat Bilgisi", "İngilizce", "Görsel Sanatlar", "Müzik", "Beden Eğitimi", "Diğer"],
+  "3. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Hayat Bilgisi", "Fen Bilimleri", "İngilizce", "Görsel Sanatlar", "Müzik", "Beden Eğitimi", "Diğer"],
+  "4. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "İnsan Hakları", "Görsel Sanatlar", "Müzik", "Diğer"],
+  "5. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "Bilişim Teknolojileri", "Müzik", "Görsel Sanatlar", "Seçmeli Dersler", "Diğer"],
+  "6. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "Bilişim Teknolojileri", "Müzik", "Görsel Sanatlar", "Seçmeli Dersler", "Diğer"],
+  "7. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "Teknoloji ve Tasarım", "Görsel Sanatlar", "Müzik", "Seçmeli Dersler", "Diğer"],
+  "8. Sınıf": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "T.C. İnkılap Tarihi", "İngilizce", "Din Kültürü", "Teknoloji ve Tasarım", "Görsel Sanatlar", "Müzik", "Seçmeli Dersler", "Diğer"],
+  "9. Sınıf": ["Tüm Dersler", "Türk Dili ve Edebiyatı", "Matematik", "Fizik", "Kimya", "Biyoloji", "Tarih", "Coğrafya", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
+  "10. Sınıf": ["Tüm Dersler", "Türk Dili ve Edebiyatı", "Matematik", "Fizik", "Kimya", "Biyoloji", "Tarih", "Coğrafya", "Felsefe", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
+  "11. Sınıf": ["Tüm Dersler", "Türk Dili ve Edebiyatı", "Matematik", "Fizik", "Kimya", "Biyoloji", "Tarih", "Coğrafya", "Felsefe", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
+  "12. Sınıf": ["Tüm Dersler", "Türk Dili ve Edebiyatı", "Matematik", "Fizik", "Kimya", "Biyoloji", "T.C. İnkılap Tarihi", "Coğrafya", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
   "Genel / Ortak": ["Tüm Dersler", "Klavuzlar", "Yönetmelikler", "Rehberlik", "Sınıf Öğretmenliği", "ŞÖK Toplantıları", "Veli Toplantıları", "Diğer"]
 };
 
