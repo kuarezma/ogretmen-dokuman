@@ -3,12 +3,24 @@ import { X, UploadCloud, FileText, CheckCircle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './AuthModal.css'; 
 
+// Sabit Kategori Verileri (Sınıf -> Ders Hiyerarşisi)
+const GRADE_LESSONS = {
+  "İlkokul (1-4)": ["Türkçe", "Matematik", "Hayat Bilgisi", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "Diğer"],
+  "Ortaokul (5-8)": ["Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "T.C. İnkılap Tarihi", "İngilizce", "Din Kültürü", "Bilişim", "Diğer"],
+  "Lise (9-12)": ["Türk Dili ve Edebiyatı", "Tarih", "Coğrafya", "Felsefe Grubu", "Matematik", "Fizik", "Kimya", "Biyoloji", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
+  "Genel / Ortak": ["Klavuzlar", "Yönetmelikler", "Rehberlik", "Sınıf Öğretmenliği", "ŞÖK Toplantıları", "Veli Toplantıları", "Diğer"]
+};
+
+const DOC_CATEGORIES = ["Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
+
 const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     type: 'word',
-    category: 'Yazılı'
+    grade: 'Ortaokul (5-8)',
+    lesson: 'Türkçe',
+    category: 'Yazılı Soruları'
   });
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -56,6 +68,8 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           title: formData.title,
           topic: formData.description, 
           type: formData.type,
+          grade: formData.grade,
+          lesson: formData.lesson,
           category: formData.category,
           uploaded_by: currentUser.username,
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
@@ -72,7 +86,7 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
         setSuccess(false);
         onUploadSuccess(data ? data[0] : null);
         onClose();
-        setFormData({ title: '', description: '', type: 'word', category: 'Yazılı' });
+        setFormData({ title: '', description: '', type: 'word', grade: 'Ortaokul (5-8)', lesson: 'Türkçe', category: 'Yazılı Soruları' });
         setFile(null);
       }, 1500);
 
@@ -116,28 +130,58 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 />
               </div>
 
-              <div className="input-group" style={{ display: 'flex', gap: '1rem' }}>
+              <div className="input-group" style={{ display: 'flex', gap: '0.5rem' }}>
                 <select 
                   className="input-field" 
-                  style={{ paddingLeft: '1.25rem' }}
+                  style={{ paddingLeft: '1rem', width: '30%' }}
+                  title="Dosya Formatı"
                   value={formData.type}
                   onChange={(e) => setFormData({...formData, type: e.target.value})}
                 >
-                  <option value="word">Word Belgesi</option>
-                  <option value="excel">Excel Klasörü</option>
-                  <option value="pdf">PDF Dosyası</option>
+                  <option value="word">Word</option>
+                  <option value="excel">Excel</option>
+                  <option value="pdf">PDF</option>
                 </select>
 
                 <select 
                   className="input-field" 
+                  style={{ paddingLeft: '1rem', width: '35%' }}
+                  title="Okul Kademesi / Sınıf"
+                  value={formData.grade}
+                  onChange={(e) => {
+                     const newGrade = e.target.value;
+                     setFormData({...formData, grade: newGrade, lesson: GRADE_LESSONS[newGrade][0]});
+                  }}
+                >
+                  {Object.keys(GRADE_LESSONS).map(grade => (
+                    <option key={grade} value={grade}>{grade}</option>
+                  ))}
+                </select>
+
+                <select 
+                  className="input-field" 
+                  style={{ paddingLeft: '1rem', width: '35%' }}
+                  title="Ders Adı"
+                  value={formData.lesson}
+                  onChange={(e) => setFormData({...formData, lesson: e.target.value})}
+                >
+                  {GRADE_LESSONS[formData.grade].map(lesson => (
+                    <option key={lesson} value={lesson}>{lesson}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="input-group">
+                <select 
+                  className="input-field" 
                   style={{ paddingLeft: '1.25rem' }}
+                  title="Belge Türü"
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                 >
-                  <option value="Yazılı">Yazılı Soruları</option>
-                  <option value="Test">Deneme / Test</option>
-                  <option value="Yıllık Plan">Yıllık Planlar</option>
-                  <option value="Proje">Proje / Etkinlik</option>
+                  {DOC_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
 

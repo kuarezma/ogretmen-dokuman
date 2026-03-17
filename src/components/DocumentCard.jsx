@@ -182,8 +182,21 @@ const DocumentCard = ({ document }) => {
         <div className="doc-icon" style={{ color: getIconColor(document.type) }}>
           <FileText size={32} />
         </div>
-        <div className="doc-meta-top">
+        <div className="doc-meta-top" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
           {getFormatBadge(document.type)}
+          
+          {document.grade && document.grade !== 'Genel' && (
+            <span className="category-badge" style={{ backgroundColor: 'rgba(56, 189, 248, 0.1)', color: 'var(--color-primary)'}}>
+              {document.grade}
+            </span>
+          )}
+          
+          {document.lesson && document.lesson !== 'Genel' && (
+            <span className="category-badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#d97706'}}>
+              {document.lesson}
+            </span>
+          )}
+
           <span className="category-badge">{document.category}</span>
         </div>
       </div>
@@ -205,7 +218,7 @@ const DocumentCard = ({ document }) => {
           </div>
         </div>
         
-        <div className="doc-actions-container" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div className="doc-actions-container" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
           <button 
             className={`btn-icon like-btn ${isLiked ? 'liked' : ''}`} 
             onClick={handleLike}
@@ -251,11 +264,11 @@ const DocumentCard = ({ document }) => {
             <span style={{ fontWeight: '500' }}>{comments.length}</span>
           </button>
 
-          <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
-            <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview} style={{ padding: '0.5rem' }}>
+          <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', flexWrap: 'wrap' }}>
+            <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
               <Eye size={16} /> Önizle
             </button>
-            <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} style={{ padding: '0.5rem' }}>
+            <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
               <Download size={16} /> İndir
             </button>
           </div>

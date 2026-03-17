@@ -39,8 +39,9 @@ const Home = () => {
     }
   };
 
-  const handleSearch = async ({ searchTerm, format, category }) => {
-    if (!searchTerm && format === 'all' && category === 'all') {
+  const handleSearch = async ({ searchTerm, format, grade, lesson, category }) => {
+    // Tüm filtreler boşsa direkt tüm listeyi göster
+    if (!searchTerm && format === 'all' && grade === 'Tüm Sınıflar' && category === 'Tüm Kategoriler') {
       setFilteredDocs(documents);
       setHasSearched(false);
       return;
@@ -62,8 +63,18 @@ const Home = () => {
         query = query.eq('type', format);
       }
 
-      // Kategori filtresi
-      if (category !== 'all') {
+      // Sınıf filtresi
+      if (grade && grade !== 'Tüm Sınıflar') {
+        query = query.eq('grade', grade);
+      }
+      
+      // Ders filtresi
+      if (lesson && lesson !== 'Tüm Dersler') {
+        query = query.eq('lesson', lesson);
+      }
+
+      // Belge Türü (Kategori) filtresi
+      if (category && category !== 'Tüm Kategoriler') {
         query = query.eq('category', category);
       }
 

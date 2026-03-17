@@ -2,24 +2,32 @@ import React, { useState } from 'react';
 import { Search, Globe, Database } from 'lucide-react';
 import './SearchBar.css';
 
+const GRADE_LESSONS = {
+  "Tüm Sınıflar": ["Tüm Dersler"],
+  "İlkokul (1-4)": ["Tüm Dersler", "Türkçe", "Matematik", "Hayat Bilgisi", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce", "Din Kültürü", "Diğer"],
+  "Ortaokul (5-8)": ["Tüm Dersler", "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "T.C. İnkılap Tarihi", "İngilizce", "Din Kültürü", "Bilişim", "Diğer"],
+  "Lise (9-12)": ["Tüm Dersler", "Türk Dili ve Edebiyatı", "Tarih", "Coğrafya", "Felsefe Grubu", "Matematik", "Fizik", "Kimya", "Biyoloji", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
+  "Genel / Ortak": ["Tüm Dersler", "Klavuzlar", "Yönetmelikler", "Rehberlik", "Sınıf Öğretmenliği", "ŞÖK Toplantıları", "Veli Toplantıları", "Diğer"]
+};
+
+const DOC_CATEGORIES = ["Tüm Kategoriler", "Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
+
 const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [format, setFormat] = useState('all');
-  const [category, setCategory] = useState('all');
-  const [searchType, setSearchType] = useState('internal'); // 'internal' or 'google'
+  const [grade, setGrade] = useState('Tüm Sınıflar');
+  const [lesson, setLesson] = useState('Tüm Dersler');
+  const [category, setCategory] = useState('Tüm Kategoriler');
+  const [searchType, setSearchType] = useState('internal');
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
     if (searchType === 'google') {
-      // Google'da Arama Yap (Yeni sekmede)
-      // Site içi aramaları Google üzerinden yapmak için 'site:...' eklenebilir
-      // Fakat genel google araması istendiyse direkt aratıyoruz
       const query = encodeURIComponent(`${searchTerm} öğretmen belge eğitim`);
       window.open(`https://www.google.com/search?q=${query}`, '_blank');
     } else {
-      // Site içi arama
-      onSearch({ searchTerm, format, category });
+      // Yenilenmiş parametreleri yolla
+      onSearch({ searchTerm, format, grade, lesson, category });
     }
   };
 
@@ -77,15 +85,41 @@ const SearchBar = ({ onSearch }) => {
             
             <div className="filter-group">
               <select 
+                value={grade} 
+                onChange={(e) => {
+                  setGrade(e.target.value);
+                  setLesson(GRADE_LESSONS[e.target.value][0]);
+                }}
+                className="filter-select"
+              >
+                {Object.keys(GRADE_LESSONS).map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <select 
+                value={lesson} 
+                onChange={(e) => setLesson(e.target.value)}
+                className="filter-select"
+                disabled={grade === 'Tüm Sınıflar'}
+              >
+                {GRADE_LESSONS[grade].map(l => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <select 
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)}
                 className="filter-select"
               >
-                <option value="all">Tüm Kategoriler</option>
-                <option value="Yazılı">Yazılı Soruları</option>
-                <option value="Test">Deneme / Test</option>
-                <option value="Yıllık Plan">Yıllık Planlar</option>
-                <option value="Proje">Proje / Etkinlik</option>
+                {DOC_CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
               </select>
             </div>
           </div>
