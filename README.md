@@ -1,16 +1,17 @@
-# React + Vite
+# Öğretmen Belge Merkezi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bu depo, Öğretmenler için belge arama, yükleme ve indirme platformunu içerir. Üyelik sistemi ile kullanıcılar belge ekleyebilir ve paylaşabilir.
 
-Currently, two official plugins are available:
+Kurulum ve Çalıştırma
+- Node.js ve npm/yarn kurulu olmalı.
+- Projeyi klonlayın ve kurulumları yapın.
+- Sunucuyu başlatın: npm start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Alan adı entegrasyonu ve gelecek adımlar için notlar aşağıdadır. 
 
-## React Compiler
+## Teknolojiler
+- Backend: Node.js, Express, SQLite (better-sqlite3), Multer, bcryptjs
+- Frontend: SPA yapısı ile basit HTML/CSS/JS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+--------
+Not: Bu proje ilerleyen aşamalarda Next.js + Supabase (PostgreSQL) ile Vercel üzerinde dağıtım hedefli olarak güncellenecektir.
