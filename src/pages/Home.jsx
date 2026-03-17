@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { initializeMockData } from '../data/mockData';
+import { supabase } from '../supabaseClient';
 import SearchBar from '../components/SearchBar';
 import DocumentCard from '../components/DocumentCard';
 import { Sparkles } from 'lucide-react';
@@ -12,11 +12,32 @@ const Home = () => {
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
-    initializeMockData();
-    const loadedDocs = JSON.parse(localStorage.getItem('documents') || '[]');
-    setDocuments(loadedDocs);
-    setFilteredDocs(loadedDocs);
+    fetchDocuments();
   }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Supabase'den gelen verileri UI ile uyumlu hale getir
+      const mappedDocs = (data || []).map(doc => ({
+        ...doc,
+        description: doc.topic,
+        uploader: doc.uploaded_by,
+        downloads: 0 // Henüz tabloya eklenmediği için statik default
+      }));
+
+      setDocuments(mappedDocs);
+      setFilteredDocs(mappedDocs);
+    } catch (err) {
+      console.error('Veritabanından belgeler çekilemedi:', err);
+    }
+  };
 
   const handleSearch = ({ searchTerm, format, category }) => {
     if (!searchTerm && format === 'all' && category === 'all') {

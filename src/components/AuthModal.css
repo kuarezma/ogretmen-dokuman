@@ -116,3 +116,9 @@
 .toggle-auth-btn:hover {
   text-decoration: underline;
 }
+
+.upload-dropzone {
+  position: relative;
+  z-index: 10;
+}
+

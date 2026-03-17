@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, UploadCloud, FileText, CheckCircle } from 'lucide-react';
-import './AuthModal.css'; // Auth Modal css'ini tekrar kullanmak için
+import { supabase } from '../supabaseClient';
+import './AuthModal.css'; 
 
 const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [formData, setFormData] = useState({
@@ -9,42 +10,77 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
     type: 'word',
     category: 'Yazılı'
   });
+  const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) return;
 
-    const newDocument = {
-      id: Date.now().toString(),
-      ...formData,
-      uploader: currentUser.username,
-      date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
-      downloads: 0
-    };
+    try {
+      let fileUrl = '';
+      if (file) {
+         const fileExt = file.name.split('.').pop();
+         const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+         
+         const { error: uploadError } = await supabase.storage
+           .from('documents')
+           .upload(fileName, file);
 
-    // Simulate upload delay
-    setTimeout(() => {
-      const docs = JSON.parse(localStorage.getItem('documents') || '[]');
-      docs.unshift(newDocument);
-      localStorage.setItem('documents', JSON.stringify(docs));
-      
+         if (uploadError) throw uploadError;
+
+         const { data: publicUrlData } = supabase.storage
+           .from('documents')
+           .getPublicUrl(fileName);
+           
+         fileUrl = publicUrlData.publicUrl;
+      }
+
+      // Supabase veritabanına ekle
+      const { data, error } = await supabase
+        .from('documents')
+        .insert([{
+          title: formData.title,
+          topic: formData.description, 
+          type: formData.type,
+          category: formData.category,
+          uploaded_by: currentUser.username,
+          date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
+          file_url: fileUrl
+        }])
+        .select();
+
+      if (error) throw error;
+
       setIsUploading(false);
       setSuccess(true);
       
       setTimeout(() => {
         setSuccess(false);
-        onUploadSuccess(newDocument);
+        onUploadSuccess(data ? data[0] : null);
         onClose();
         setFormData({ title: '', description: '', type: 'word', category: 'Yazılı' });
+        setFile(null);
       }, 1500);
-    }, 1200);
+
+    } catch (err) {
+      console.error("Yükleme hatası:", err);
+      alert("Belge yüklenirken bir hata oluştu.");
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -58,7 +94,7 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           <div className="success-state" style={{ textAlign: 'center', padding: '2rem 0' }}>
             <CheckCircle size={64} color="var(--color-success)" style={{ marginBottom: '1rem', margin: '0 auto' }} />
             <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Başarıyla Yüklendi!</h2>
-            <p style={{ color: 'var(--color-text-muted)' }}>Belgeniz sisteme eklendi ve paylaşıma açıldı.</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>Belgeniz bulut sistemine eklendi ve tüm öğretmenlerin erişimine açıldı.</p>
           </div>
         ) : (
           <>
@@ -117,23 +153,37 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 />
               </div>
 
-              <div className="upload-dropzone" style={{
-                border: '2px dashed #cbd5e1',
-                borderRadius: 'var(--radius-lg)',
-                padding: '2rem',
-                textAlign: 'center',
-                cursor: 'pointer',
-                backgroundColor: 'rgba(248, 250, 252, 0.5)'
-              }}>
-                <UploadCloud size={32} color="var(--color-text-muted)" style={{ margin: '0 auto 0.5rem' }} />
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                  Dosyanızı buraya sürükleyin veya <strong>seçmek için tıklayın</strong>
+              <div className="upload-dropzone" 
+                   style={{
+                     position: 'relative',
+                     border: '2px dashed #cbd5e1',
+                     borderRadius: 'var(--radius-lg)',
+                     padding: '2rem',
+                     textAlign: 'center',
+                     cursor: 'pointer',
+                     display: 'block',
+                     backgroundColor: file ? 'rgba(56, 189, 248, 0.1)' : 'rgba(248, 250, 252, 0.5)',
+                     zIndex: 10
+                   }}>
+                <input 
+                  id="file-upload"
+                  type="file" 
+                  onChange={handleFileChange} 
+                  style={{ 
+                    position: 'absolute',
+                    top: 0, left: 0, width: '100%', height: '100%', 
+                    opacity: 0, cursor: 'pointer', zIndex: 20 
+                  }} 
+                  required 
+                />
+                <UploadCloud size={32} color={file ? "var(--color-primary)" : "var(--color-text-muted)"} style={{ margin: '0 auto 0.5rem', position: 'relative', zIndex: 10 }} />
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', position: 'relative', zIndex: 10 }}>
+                  {file ? <strong>Seçilen Dosya: {file.name}</strong> : <span>Dosyanızı seçmek için <strong>tıklayın</strong></span>}
                 </p>
-                <input type="file" style={{ display: 'none' }} required />
               </div>
 
               <button type="submit" className="btn btn-primary auth-btn" disabled={isUploading}>
-                {isUploading ? 'Yükleniyor...' : 'Paylaş'}
+                {isUploading ? 'Buluta Kaydediliyor...' : 'Tüm Türkiye İle Paylaş'}
               </button>
             </form>
           </>

@@ -1,109 +1,168 @@
 import React, { useState } from 'react';
 import { X, User, Lock, Mail } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 import './AuthModal.css';
 
 const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(isLoginView);
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLogin) {
-      // Mock Login
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find(u => u.username === formData.username && u.password === formData.password);
-      
-      if (user) {
-        localStorage.setItem('currentUser', JSON.stringify(user));
+    setError('');
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        // Supabase Auth Email/Password Girişi
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (signInError) {
+          setError('E-posta adresi veya şifre hatalı!');
+          setIsLoading(false);
+          return;
+        }
+
+        // Kullanıcı adını users tablosundan çek
+        const { data: userData } = await supabase
+          .from('users')
+          .select('username')
+          .eq('email', formData.email)
+          .single();
+
+        const userObj = {
+          email: formData.email,
+          username: userData ? userData.username : formData.email.split('@')[0],
+          id: data.user.id
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(userObj));
         onLoginSuccess();
         onClose();
-      } else {
-        setError('Kullanıcı adı veya şifre hatalı!');
-      }
-    } else {
-      // Mock Register
-      if (formData.username.length < 3 || formData.password.length < 6) {
-        setError('Kullanıcı adı en az 3, şifre en az 6 karakter olmalıdır.');
-        return;
-      }
-      
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const existingUser = users.find(u => u.username === formData.username);
-      
-      if (existingUser) {
-        setError('Bu kullanıcı adı zaten alınmış!');
-        return;
-      }
 
-      const newUser = { username: formData.username, email: formData.email, password: formData.password };
-      users.push(newUser);
-      localStorage.setItem('users', JSON.stringify(users));
-      
-      // Auto login after register
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      onLoginSuccess();
-      onClose();
+      } else {
+        // Kayıt İşlemi
+        if (formData.username.length < 3 || formData.password.length < 6) {
+          setError('Kullanıcı adı en az 3, şifre en az 6 karakter olmalıdır.');
+          setIsLoading(false);
+          return;
+        }
+
+        // Önce kullanıcı adının alınıp alınmadığını kontrol edelim
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('username')
+          .eq('username', formData.username)
+          .single();
+
+        if (existingUser) {
+          setError('Bu kullanıcı adı zaten sistemde kayıtlı!');
+          setIsLoading(false);
+          return;
+        }
+
+        // Supabase Auth Kayıt
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (signUpError) {
+          if (signUpError.message.includes('already registered')) {
+             setError('Bu e-posta adresi ile zaten kayıt olunmuş.');
+          } else {
+             setError(signUpError.message);
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        // public.users tablosuna kullanıcı metadatası ekleyelim
+        await supabase.from('users').insert([{ 
+          username: formData.username, 
+          email: formData.email,
+          password: 'encrypted' // Gerçek şifre Auth tablosunda tutuluyor
+        }]);
+
+        const userObj = {
+          email: formData.email,
+          username: formData.username,
+          id: authData?.user?.id
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(userObj));
+        onLoginSuccess();
+        onClose();
+      }
+    } catch (err) {
+      setError('Bağlantı sırasında bir hata oluştu.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="modal-overlay animate-fade-in">
       <div className="modal-content glass-panel">
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-close" onClick={onClose} disabled={isLoading}>
           <X size={24} />
         </button>
         
         <div className="modal-header">
           <h2>{isLogin ? 'Giriş Yap' : 'Kayıt Ol'}</h2>
-          <p>{isLogin ? 'Platforma hoşgeldiniz, lütfen giriş yapın.' : 'Aramıza katılın ve belgelerinizi paylaşın.'}</p>
+          <p>{isLogin ? 'Platforma hoşgeldiniz, lütfen e-posta ve şifrenizle giriş yapın.' : 'Aramıza katılın ve kendi belgelerinizi paylaşın.'}</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
-          <div className="input-group">
-            <User className="input-icon" size={20} />
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="Kullanıcı Adı" 
-              value={formData.username}
-              onChange={(e) => setFormData({...formData, username: e.target.value})}
-              required 
-            />
-          </div>
-
           {!isLogin && (
             <div className="input-group">
-              <Mail className="input-icon" size={20} />
+              <User className="input-icon" size={20} />
               <input 
-                type="email" 
+                type="text" 
                 className="input-field" 
-                placeholder="E-posta Adresi" 
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required 
+                placeholder="Kullanıcı Adı" 
+                value={formData.username}
+                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                required={!isLogin} 
               />
             </div>
           )}
+
+          <div className="input-group">
+            <Mail className="input-icon" size={20} />
+            <input 
+              type="email" 
+              className="input-field" 
+              placeholder="E-posta Adresi" 
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              required 
+            />
+          </div>
 
           <div className="input-group">
             <Lock className="input-icon" size={20} />
             <input 
               type="password" 
               className="input-field" 
-              placeholder="Şifre" 
+              placeholder="Şifre (En az 6 karakter)" 
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
               required 
             />
           </div>
 
-          <button type="submit" className="btn btn-primary auth-btn">
-            {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+          <button type="submit" className="btn btn-primary auth-btn" disabled={isLoading}>
+            {isLoading ? 'Lütfen Bekleyin...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
           </button>
         </form>
 
@@ -113,6 +172,7 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
             <button 
               className="toggle-auth-btn" 
               onClick={() => { setIsLogin(!isLogin); setError(''); }}
+              disabled={isLoading}
             >
               {isLogin ? 'Kayıt Ol' : 'Giriş Yap'}
             </button>

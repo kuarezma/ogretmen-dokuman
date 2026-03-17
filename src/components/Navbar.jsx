@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, User, LogOut, Upload } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
+import { supabase } from '../supabaseClient';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -20,7 +21,8 @@ const Navbar = () => {
     }
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem('currentUser');
     setUser(null);
     window.location.reload();
