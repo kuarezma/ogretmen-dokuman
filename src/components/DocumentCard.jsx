@@ -7,6 +7,7 @@ const DocumentCard = ({ document }) => {
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [uploaderAvatar, setUploaderAvatar] = useState(null);
   
   // Yorum State'leri
   const [comments, setComments] = useState([]);
@@ -19,7 +20,25 @@ const DocumentCard = ({ document }) => {
   useEffect(() => {
     fetchLikes();
     fetchComments();
+    fetchUploaderAvatar();
   }, [document.id]);
+
+  const fetchUploaderAvatar = async () => {
+    try {
+      if (!document.uploader) return;
+      const { data, error } = await supabase
+        .from('users')
+        .select('avatar_url')
+        .eq('username', document.uploader)
+        .single();
+        
+      if (!error && data?.avatar_url) {
+        setUploaderAvatar(data.avatar_url);
+      }
+    } catch (err) {
+      console.error("Uploader avatar çekilemedi", err);
+    }
+  };
 
   const fetchComments = async () => {
     try {
@@ -30,7 +49,26 @@ const DocumentCard = ({ document }) => {
         .order('created_at', { ascending: true });
         
       if (!error && data) {
-        setComments(data);
+        // Yorum sahiplerinin avatarlarını da eklemek için bir harita oluştur (Performans için)
+        const usernames = [...new Set(data.map(c => c.user_name))];
+        const { data: usersData } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .in('username', usernames);
+          
+        const avatarMap = {};
+        if (usersData) {
+          usersData.forEach(user => {
+            avatarMap[user.username] = user.avatar_url;
+          });
+        }
+        
+        const commentsWithAvatars = data.map(comment => ({
+          ...comment,
+          user_avatar: avatarMap[comment.user_name] || null
+        }));
+        
+        setComments(commentsWithAvatars);
       }
     } catch (err) {
       console.error("Yorumlar çekilemedi", err);
@@ -209,7 +247,15 @@ const DocumentCard = ({ document }) => {
       <div className="doc-card-footer">
         <div className="doc-info">
           <div className="info-item">
-            <UserIcon size={14} />
+            {uploaderAvatar ? (
+              <img 
+                src={uploaderAvatar} 
+                alt={document.uploader} 
+                style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }} 
+              />
+            ) : (
+              <UserIcon size={14} />
+            )}
             <span>{document.uploader}</span>
           </div>
           <div className="info-item">
@@ -293,8 +339,23 @@ const DocumentCard = ({ document }) => {
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--color-border)'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--color-primary)' }}>{comment.user_name}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', alignItems: 'center' }}>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {comment.user_avatar ? (
+                        <img 
+                          src={comment.user_avatar} 
+                          alt={comment.user_name} 
+                          style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover' }} 
+                        />
+                      ) : (
+                         <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--color-primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <UserIcon size={12} color="var(--color-primary)" />
+                         </div>
+                      )}
+                      <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--color-primary)' }}>{comment.user_name}</span>
+                    </div>
+
                     <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                       {new Date(comment.created_at).toLocaleDateString('tr-TR')}
                     </span>

@@ -6,13 +6,39 @@ import './Profile.css';
 const Profile = () => {
   const [myDocuments, setMyDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
   useEffect(() => {
     if (currentUser) {
       fetchMyDocuments();
+      fetchUserAvatar();
     }
   }, []);
+
+  const fetchUserAvatar = async () => {
+    try {
+      if (!currentUser?.email) return;
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('avatar_url')
+        .eq('email', currentUser.email)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') {
+        console.error("Avatar çekme hatası:", error);
+      }
+      
+      if (data?.avatar_url) {
+        setAvatarUrl(data.avatar_url);
+      }
+    } catch (err) {
+      console.error("Avatar işlemi başarısız:", err);
+    }
+  };
 
   const fetchMyDocuments = async () => {
     setIsLoading(true);
@@ -29,6 +55,50 @@ const Profile = () => {
       console.error("Belgeleriniz yüklenirken hata oluştu:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event) => {
+    try {
+      setIsUploadingAvatar(true);
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+      
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+      
+      // Resmi Supabase Storage (avatars) içine yükle
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+      
+      // Resmin public URL'sini al
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+      // users tablosuna URL'yi kaydet
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ avatar_url: publicUrl })
+        .eq('email', currentUser.email);
+        
+      if (updateError) throw updateError;
+      
+      // State'i güncelle ve ekrana bas
+      setAvatarUrl(publicUrl);
+      alert('Profil resminiz başarıyla güncellendi!');
+      
+    } catch (error) {
+      console.error("Resim yükleme hatası:", error);
+      alert('Resim yüklenirken bir hata oluştu');
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
@@ -85,9 +155,27 @@ const Profile = () => {
   return (
     <div className="profile-container animate-fade-in">
       <div className="profile-header glass-panel">
-        <div className="profile-avatar">
-          <User size={48} color="var(--color-primary)" />
+        <div className="avatar-section">
+          <div className="profile-avatar">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profil Resmi" className="avatar-image" />
+            ) : (
+              <User size={48} color="var(--color-primary)" />
+            )}
+          </div>
+          
+          <label className={`avatar-upload-btn ${isUploadingAvatar ? 'disabled' : ''}`}>
+            {isUploadingAvatar ? 'Yükleniyor...' : 'Resim Değiştir'}
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleAvatarUpload} 
+              disabled={isUploadingAvatar}
+              style={{ display: 'none' }}
+            />
+          </label>
         </div>
+
         <div className="profile-info">
           <h1>{currentUser.username}</h1>
           <p>{currentUser.email}</p>
