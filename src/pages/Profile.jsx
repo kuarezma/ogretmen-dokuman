@@ -20,10 +20,10 @@ const Profile = () => {
 
   const fetchUserAvatar = async () => {
     try {
-      // Önce Supabase Auth session metadata'dan kontrol et (en güvenilir yol)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.user_metadata?.avatar_url) {
-        setAvatarUrl(session.user.user_metadata.avatar_url);
+      // Sunucudan güncel kullanıcı verisini çek (getSession() önbellek okur, getUser() her zaman güncel!)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.user_metadata?.avatar_url) {
+        setAvatarUrl(user.user_metadata.avatar_url);
         return;
       }
       
