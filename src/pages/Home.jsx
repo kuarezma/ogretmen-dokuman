@@ -266,7 +266,7 @@ const Home = () => {
               {/* SINIF KLASÖRLERİ */}
               <section className="category-section">
                  <div className="section-header">
-                   <h3><Folder size={24} style={{ color: 'var(--color-primary)', marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }}/> Arşiv Klasörleri</h3>
+                   <h3><Folder size={24} fill="currentColor" style={{ color: 'var(--color-primary)', marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }}/> Arşiv Klasörleri</h3>
                  </div>
                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
                     {Object.keys(GRADE_LESSONS).map((grade) => {
@@ -278,7 +278,7 @@ const Home = () => {
                         className="folder-card glass-panel hover-effect"
                         style={{ padding: '1.5rem', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-lg)' }}
                       >
-                        <Folder size={48} color="var(--color-primary)" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
+                        <Folder size={48} color="var(--color-primary)" fill="currentColor" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
                         <h4 style={{ margin: 0, color: 'var(--color-text)' }}>{grade}</h4>
                       </div>
                     )})}
@@ -298,7 +298,7 @@ const Home = () => {
                       className="folder-card glass-panel hover-effect"
                       style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', borderRadius: 'var(--radius-lg)' }}
                     >
-                      <Folder size={32} color="var(--color-warning)" style={{ opacity: 0.9 }} />
+                      <Folder size={32} color="var(--color-warning)" fill="currentColor" style={{ opacity: 0.9 }} />
                       <h4 style={{ margin: 0, color: 'var(--color-text)', fontSize: '1.05rem' }}>{lesson}</h4>
                     </div>
                   ))}
@@ -317,7 +317,7 @@ const Home = () => {
                       className="folder-card glass-panel hover-effect"
                       style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', borderRadius: 'var(--radius-lg)' }}
                     >
-                      <Folder size={32} color="#10b981" style={{ opacity: 0.9 }} />
+                      <Folder size={32} color="#10b981" fill="currentColor" style={{ opacity: 0.9 }} />
                       <h4 style={{ margin: 0, color: 'var(--color-text)', fontSize: '0.95rem' }}>{cat}</h4>
                     </div>
                   ))}
