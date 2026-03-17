@@ -115,17 +115,34 @@
 
 @media (min-width: 768px) {
   .search-form {
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 
+      "input button"
+      "filters filters";
+    gap: 1rem;
     align-items: center;
   }
   
   .search-input-wrapper {
-    flex: 2;
+    grid-area: input;
   }
   
+  .search-btn {
+    grid-area: button;
+    height: 100%;
+  }
+
   .filters-wrapper {
-    flex: 3;
-    flex-wrap: nowrap;
+    grid-area: filters;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  
+  .filter-group {
+    /* flex iptal, grid'e bıraktık */
+    min-width: 0;
   }
   
   .search-input {

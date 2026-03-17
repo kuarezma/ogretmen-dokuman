@@ -134,9 +134,9 @@ const SearchBar = ({ onSearch }) => {
             </div>
           </div>
         )}
-
+        
         <button type="submit" className="btn btn-primary search-btn">
-          {searchType === 'internal' ? 'Bul' : 'Google\'da Ara'}
+          {searchType === 'google' ? 'Google\'da Bul' : 'Bul'}
         </button>
       </form>
     </div>
