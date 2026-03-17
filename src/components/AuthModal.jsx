@@ -8,8 +8,27 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      setError('Şifre sıfırlama için lütfen e-posta adresinizi girin.');
+      return;
+    }
+    setIsLoading(true);
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(formData.email, {
+      redirectTo: window.location.origin + '/profile',
+    });
+    setIsLoading(false);
+    if (resetError) {
+      setError('Şifre sıfırlama e-postası gönderilemedi: ' + resetError.message);
+    } else {
+      setResetSent(true);
+      setError('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -164,6 +183,23 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
           <button type="submit" className="btn btn-primary auth-btn" disabled={isLoading}>
             {isLoading ? 'Lütfen Bekleyin...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
           </button>
+
+          {isLogin && (
+            <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+              {resetSent ? (
+                <p style={{ color: 'var(--color-success, #10b981)', fontSize: '0.9rem' }}>✅ Şifre sıfırlama e-postası gönderildi!</p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={isLoading}
+                  style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.9rem', textDecoration: 'underline' }}
+                >
+                  Şifremi Unuttum
+                </button>
+              )}
+            </div>
+          )}
         </form>
 
         <div className="modal-footer">
