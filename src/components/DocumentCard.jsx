@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart } from 'lucide-react';
+import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './DocumentCard.css';
 
@@ -7,11 +7,68 @@ const DocumentCard = ({ document }) => {
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  
+  // Yorum State'leri
+  const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
   useEffect(() => {
     fetchLikes();
+    fetchComments();
   }, [document.id]);
+
+  const fetchComments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('document_comments')
+        .select('*')
+        .eq('document_id', document.id)
+        .order('created_at', { ascending: true });
+        
+      if (!error && data) {
+        setComments(data);
+      }
+    } catch (err) {
+      console.error("Yorumlar çekilemedi", err);
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!currentUser) {
+      alert("Yorum yapmak için giriş yapmalısınız.");
+      return;
+    }
+    if (!newComment.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const { data, error } = await supabase
+        .from('document_comments')
+        .insert([{ 
+          document_id: document.id, 
+          user_name: currentUser.username,
+          content: newComment.trim()
+        }])
+        .select();
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setComments([...comments, data[0]]);
+        setNewComment("");
+      }
+    } catch (err) {
+      console.error("Yorum ekleme başarısız:", err);
+      alert("Yorum eklenirken hata oluştu.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const fetchLikes = async () => {
     try {
@@ -174,7 +231,27 @@ const DocumentCard = ({ document }) => {
             <span style={{ fontWeight: '500' }}>{likesCount}</span>
           </button>
 
-          <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+          <button 
+            className="btn-icon comment-toggle-btn" 
+            onClick={() => setShowComments(!showComments)}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.25rem', 
+              background: showComments ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: showComments ? 'var(--color-primary)' : 'var(--color-text-muted)',
+              transition: 'all 0.2s ease',
+              padding: '0.25rem 0.5rem',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <MessageSquare size={20} />
+            <span style={{ fontWeight: '500' }}>{comments.length}</span>
+          </button>
+
+          <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
             <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview} style={{ padding: '0.5rem' }}>
               <Eye size={16} /> Önizle
             </button>
@@ -184,6 +261,72 @@ const DocumentCard = ({ document }) => {
           </div>
         </div>
       </div>
+      
+      {/* Yorumlar Bölümü (Açılır Kapanır) */}
+      {showComments && (
+        <div className="comments-section" style={{ 
+          borderTop: '1px solid var(--color-border)', 
+          padding: '1rem',
+          backgroundColor: 'rgba(249, 250, 251, 0.5)'
+        }}>
+          
+          {/* Yorum Listesi */}
+          {comments.length > 0 ? (
+            <div className="comments-list" style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {comments.map((comment) => (
+                <div key={comment.id} className="comment-item" style={{ 
+                  background: 'white', 
+                  padding: '0.75rem', 
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                    <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--color-primary)' }}>{comment.user_name}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                      {new Date(comment.created_at).toLocaleDateString('tr-TR')}
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text)' }}>{comment.content}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+              Henüz yorum yapılmamış. İlk yorumu siz yapın!
+            </div>
+          )}
+
+          {/* Yorum Ekleme Formu */}
+          {currentUser ? (
+            <form onSubmit={handleAddComment} style={{ display: 'flex', gap: '0.5rem' }}>
+              <input 
+                type="text" 
+                placeholder="Bir yorum yazın..." 
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                style={{ 
+                  flex: 1, 
+                  padding: '0.5rem 0.75rem', 
+                  borderRadius: 'var(--radius-md)', 
+                  border: '1px solid var(--color-border)',
+                  outline: 'none'
+                }}
+              />
+              <button 
+                type="submit" 
+                className="btn btn-primary btn-sm"
+                disabled={isSubmitting || !newComment.trim()}
+              >
+                {isSubmitting ? '...' : 'Gönder'}
+              </button>
+            </form>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '0.5rem', background: 'var(--color-border)', borderRadius: 'var(--radius-md)', fontSize: '0.85rem' }}>
+              Yorum yapmak için giriş yapmalısınız.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
