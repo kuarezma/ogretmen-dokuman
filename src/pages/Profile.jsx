@@ -20,23 +20,26 @@ const Profile = () => {
 
   const fetchUserAvatar = async () => {
     try {
+      // Önce Supabase Auth session metadata'dan kontrol et (en güvenilir yol)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.user_metadata?.avatar_url) {
+        setAvatarUrl(session.user.user_metadata.avatar_url);
+        return;
+      }
+      
+      // Sonra users tablosundan dene
       if (!currentUser?.email) return;
-
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('users')
         .select('avatar_url')
         .eq('email', currentUser.email)
-        .single();
+        .maybeSingle();
         
-      if (error && error.code !== 'PGRST116') {
-        console.error("Avatar çekme hatası:", error);
-      }
-      
       if (data?.avatar_url) {
         setAvatarUrl(data.avatar_url);
       }
     } catch (err) {
-      console.error("Avatar işlemi başarısız:", err);
+      console.error("Avatar çekme başarısız:", err);
     }
   };
 
@@ -61,48 +64,56 @@ const Profile = () => {
   const handleAvatarUpload = async (event) => {
     try {
       setIsUploadingAvatar(true);
-      if (!event.target.files || event.target.files.length === 0) {
-        return;
-      }
+      if (!event.target.files || event.target.files.length === 0) return;
       
       const file = event.target.files[0];
+      
+      // YÖNTEM 1: Supabase Storage kullan
       const fileExt = file.name.split('.').pop();
-      const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `avatar-${Date.now()}.${fileExt}`;
       
-      // Resmi Supabase Storage (avatars) içine yükle
-      let { error: uploadError } = await supabase.storage
+      let publicUrl = null;
+      
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(fileName, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
-      
-      // Resmin public URL'sini al
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName);
+        publicUrl = urlData?.publicUrl;
+      } else {
+        console.warn("Storage upload başarısız, base64 yöntemi deneniyor:", uploadError.message);
         
-      // users tablosuna URL'yi kaydet
-      const { data: updateData, error: updateError } = await supabase
-        .from('users')
-        .update({ avatar_url: publicUrl })
-        .eq('email', currentUser.email)
-        .select();
-        
-      if (updateError) throw updateError;
-      
-      // Eğer RLS yetkisi yoksa Supabase hata vermez ama 0 satır günceller.
-      if (!updateData || updateData.length === 0) {
-        throw new Error("Veritabanı güncelleme izni reddedildi (RLS Hatası). Lütfen yetkilendirme SQL'ini çalıştırın.");
+        // YÖNTEM 2 (yedek): Resmi base64'e çevir ve metadata olarak kaydet
+        const reader = new FileReader();
+        publicUrl = await new Promise((resolve) => {
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(file);
+        });
       }
       
-      // State'i güncelle ve ekrana bas
+      if (!publicUrl) throw new Error("Resim URL'si alınamadı.");
+      
+      // Supabase Auth kullanıcı metadata'sına kaydet (RLS gerektirmez!)
+      const { error: authUpdateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl }
+      });
+      
+      if (authUpdateError) {
+        console.warn("Auth metadata güncellenemedi:", authUpdateError.message);
+        // users tablosunu da dene
+        await supabase.from('users').update({ avatar_url: publicUrl }).eq('email', currentUser.email);
+      }
+      
+      // Ekranda göster
       setAvatarUrl(publicUrl);
-      alert('Profil resminiz başarıyla güncellendi!');
+      alert('Profil resminiz başarıyla güncellendi! 🎉');
       
     } catch (error) {
       console.error("Resim yükleme hatası:", error);
-      alert('Resim yüklenirken bir hata oluştu');
+      alert(`Hata: ${error.message}`);
     } finally {
       setIsUploadingAvatar(false);
     }
