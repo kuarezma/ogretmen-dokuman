@@ -103,6 +103,9 @@ const Home = () => {
     }
   };
 
+  // Son Eklenenler vitrini için ilk 3 belgeyi al
+  const recentDocuments = documents.slice(0, 3);
+
   // Kategori Listeleri Aktarıcısı
   const GRADE_LESSONS = {
     "Okul Öncesi": ["Oyun ve Etkinlik", "Boyama", "Masal / Hikaye", "Diğer"],
