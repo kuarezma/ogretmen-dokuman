@@ -39,7 +39,7 @@ const Home = () => {
     }
   };
 
-  const handleSearch = ({ searchTerm, format, category }) => {
+  const handleSearch = async ({ searchTerm, format, category }) => {
     if (!searchTerm && format === 'all' && category === 'all') {
       setFilteredDocs(documents);
       setHasSearched(false);
@@ -48,30 +48,44 @@ const Home = () => {
 
     setIsSearching(true);
     setHasSearched(true);
-    let results = documents;
+    
+    try {
+      let query = supabase.from('documents').select('*');
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      results = results.filter(
-        (doc) =>
-          doc.title.toLowerCase().includes(term) ||
-          doc.description.toLowerCase().includes(term) ||
-          doc.uploader.toLowerCase().includes(term)
-      );
-    }
+      // Arama terimi (title, topic veya uploaded_by içinde geçiyorsa)
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,topic.ilike.%${searchTerm}%,uploaded_by.ilike.%${searchTerm}%`);
+      }
 
-    if (format !== 'all') {
-      results = results.filter((doc) => doc.type.toLowerCase() === format);
-    }
+      // Format filtresi
+      if (format !== 'all') {
+        query = query.eq('type', format);
+      }
 
-    if (category !== 'all') {
-      results = results.filter((doc) => doc.category === category);
-    }
+      // Kategori filtresi
+      if (category !== 'all') {
+        query = query.eq('category', category);
+      }
 
-    setTimeout(() => {
-      setFilteredDocs(results);
+      // Sonuçları puana/zaman göre sırala (Yeni hedefler)
+      query = query.order('created_at', { ascending: false });
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const mappedDocs = (data || []).map(doc => ({
+        ...doc,
+        description: doc.topic,
+        uploader: doc.uploaded_by,
+        downloads: 0
+      }));
+
+      setFilteredDocs(mappedDocs);
+    } catch (err) {
+      console.error("Arama sırasında hata:", err);
+    } finally {
       setIsSearching(false);
-    }, 400);
+    }
   };
 
   const categories = [...new Set(documents.map(doc => doc.category))];

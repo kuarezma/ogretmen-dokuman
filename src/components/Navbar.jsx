@@ -64,7 +64,9 @@ const Navbar = () => {
           <nav className="nav-actions">
             {user ? (
               <>
-                <span className="welcome-text">Hoşgeldin, <strong>{user.username}</strong></span>
+                <span className="welcome-text">
+                  Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
+                </span>
                 <button 
                   className="btn btn-outline nav-btn"
                   onClick={() => setIsUploadOpen(true)}
