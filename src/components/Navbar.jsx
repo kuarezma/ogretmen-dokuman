@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload } from 'lucide-react';
+import { BookOpen, User, LogOut, Upload, Moon, Sun } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
 import { supabase } from '../supabaseClient';
@@ -8,6 +8,7 @@ import './Navbar.css';
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
+  const [isDark, setIsDark] = useState(false);
   
   // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -19,7 +20,26 @@ const Navbar = () => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    
+    // LocalStorage'dan dark mode tercihini oku
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDark(true);
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
   }, []);
+
+  const toggleDarkMode = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    if (newDark) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -41,12 +61,10 @@ const Navbar = () => {
   const handleAuthSuccess = () => {
     const storedUser = localStorage.getItem('currentUser');
     setUser(JSON.parse(storedUser));
-    window.location.reload(); // Reload to fetch user docs potentially if needed
+    window.location.reload();
   };
 
-  const handleUploadSuccess = (newDoc) => {
-    // Arama sayfasında güncellenmiş belgeleri göstermek için sayfayı yenile
-    // Gerçek bir uygulamada Context veya Redux kullanılırdı
+  const handleUploadSuccess = () => {
     window.location.reload();
   };
 
@@ -62,6 +80,16 @@ const Navbar = () => {
           </Link>
 
           <nav className="nav-actions">
+            {/* Dark Mode Toggle */}
+            <button
+              className="btn btn-ghost nav-btn dark-toggle"
+              onClick={toggleDarkMode}
+              title={isDark ? 'Açık Mod' : 'Karanlık Mod'}
+              style={{ padding: '0.4rem 0.6rem' }}
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
             {user ? (
               <>
                 <span className="welcome-text">
