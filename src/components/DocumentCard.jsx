@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, FileText, Download, User as UserIcon, Calendar } from 'lucide-react';
+import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye } from 'lucide-react';
 import './DocumentCard.css';
 
 const DocumentCard = ({ document }) => {
@@ -20,9 +20,29 @@ const DocumentCard = ({ document }) => {
     );
   };
 
+  const handlePreview = () => {
+    if (!document.file_url) {
+      alert("Bu belgenin dosyası henüz yüklenmemiş.");
+      return;
+    }
+    
+    // PDF ise direkt açılır, Word/Excel ise Office Online Viewer ile açılır
+    if (document.type.toLowerCase() === 'pdf') {
+       window.open(document.file_url, '_blank');
+    } else {
+       const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`;
+       window.open(viewerUrl, '_blank');
+    }
+  };
+
   const handleDownload = () => {
-    // Mock download action
-    alert(`${document.title} indiriliyor...`);
+    if (!document.file_url) {
+      alert("Bu belgenin dosyası henüz yüklenmemiş.");
+      return;
+    }
+    // İndirme işlemini simüle etmek yerine direkt dosyayı yeni sekmede de açtırabiliriz
+    // veya indirme linki olarak kullanabiliriz. (Supabase public URL direkt indirmeye de zorlanabilir)
+    window.open(document.file_url, '_blank');
   };
 
   return (
@@ -54,10 +74,14 @@ const DocumentCard = ({ document }) => {
           </div>
         </div>
         
-        <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload}>
-          <Download size={16} /> İndir
-          <span className="dl-count">({document.downloads})</span>
-        </button>
+        <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview} style={{ padding: '0.5rem' }}>
+            <Eye size={16} /> Önizle
+          </button>
+          <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} style={{ padding: '0.5rem' }}>
+            <Download size={16} /> İndir
+          </button>
+        </div>
       </div>
     </div>
   );
