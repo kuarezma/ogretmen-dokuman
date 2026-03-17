@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload, Moon, Sun } from 'lucide-react';
+import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2 } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
 import { supabase } from '../supabaseClient';
@@ -89,6 +89,16 @@ const Navbar = () => {
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
+
+            {/* İstatistik Linki */}
+            <Link
+              to="/stats"
+              className="btn btn-ghost nav-btn"
+              title="İstatistikler"
+              style={{ padding: '0.4rem 0.6rem' }}
+            >
+              <BarChart2 size={18} />
+            </Link>
 
             {user ? (
               <>
