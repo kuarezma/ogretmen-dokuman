@@ -83,12 +83,18 @@ const Profile = () => {
         .getPublicUrl(filePath);
         
       // users tablosuna URL'yi kaydet
-      const { error: updateError } = await supabase
+      const { data: updateData, error: updateError } = await supabase
         .from('users')
         .update({ avatar_url: publicUrl })
-        .eq('email', currentUser.email);
+        .eq('email', currentUser.email)
+        .select();
         
       if (updateError) throw updateError;
+      
+      // Eğer RLS yetkisi yoksa Supabase hata vermez ama 0 satır günceller.
+      if (!updateData || updateData.length === 0) {
+        throw new Error("Veritabanı güncelleme izni reddedildi (RLS Hatası). Lütfen yetkilendirme SQL'ini çalıştırın.");
+      }
       
       // State'i güncelle ve ekrana bas
       setAvatarUrl(publicUrl);
