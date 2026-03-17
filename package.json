@@ -1,0 +1,22 @@
+{
+  "name": "ogretmen-belge-merkezi",
+  "version": "1.0.0",
+  "description": "Öğretmenler için belge arama, yükleme ve indirme platformu",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["teachers", "documents", "education"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.6.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1",
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}
