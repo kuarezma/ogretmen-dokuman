@@ -102,7 +102,9 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
 
     } catch (err) {
       console.error("Yükleme hatası:", err);
-      alert("Belge yüklenirken bir hata oluştu.");
+      const msg = err?.message || err?.error_description || JSON.stringify(err);
+      alert("Belge yüklenirken hata oluştu:\n" + msg);
+    } finally {
       setIsUploading(false);
     }
   };
