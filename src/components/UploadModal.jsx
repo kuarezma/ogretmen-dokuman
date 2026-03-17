@@ -237,7 +237,7 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
               </div>
 
               <button type="submit" className="btn btn-primary auth-btn" disabled={isUploading}>
-                {isUploading ? 'Buluta Kaydediliyor...' : 'Tüm Türkiye İle Paylaş'}
+                {isUploading ? 'Kaydediliyor...' : 'Paylaş'}
               </button>
             </form>
           </>

@@ -68,6 +68,11 @@
   .welcome-text {
     display: none;
   }
+
+  /* Desktop'ta gizle, mobilden göster */
+  .profile-mobile-btn {
+    display: flex;
+  }
   
   .nav-container {
     height: 60px;
@@ -90,6 +95,22 @@
   .nav-btn {
     padding: 0.4rem 0.7rem;
     font-size: 0.8rem;
+  }
+
+  /* Yükle yazısını mobilden gizle, sadece ikon göster */
+  .nav-btn-text {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Desktop'ta profil ikonunu gizle, welcome-text var zaten */
+  .profile-mobile-btn {
+    display: none;
+  }
+  
+  .nav-btn-text {
+    display: inline;
   }
 }
 

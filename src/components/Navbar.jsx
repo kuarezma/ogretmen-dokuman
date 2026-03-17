@@ -105,14 +105,23 @@ const Navbar = () => {
                 <span className="welcome-text">
                   Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
                 </span>
+                {/* Mobil için her zaman görünen profil ikonu */}
+                <Link
+                  to="/profile"
+                  className="btn btn-ghost nav-btn profile-mobile-btn"
+                  title={user.username}
+                  style={{ padding: '0.4rem 0.6rem' }}
+                >
+                  <User size={18} />
+                </Link>
                 <button 
                   className="btn btn-outline nav-btn"
                   onClick={() => setIsUploadOpen(true)}
                 >
-                  <Upload size={18} /> Yükle
+                  <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
                 </button>
                 <button className="btn btn-ghost nav-btn" onClick={handleLogout}>
-                  <LogOut size={18} /> Çıkış
+                  <LogOut size={18} />
                 </button>
               </>
             ) : (
