@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare } from 'lucide-react';
+import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare, Star } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './DocumentCard.css';
 
@@ -8,6 +8,8 @@ const DocumentCard = ({ document }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [uploaderAvatar, setUploaderAvatar] = useState(null);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavoriting, setIsFavoriting] = useState(false);
   
   // Yorum State'leri
   const [comments, setComments] = useState([]);
@@ -21,6 +23,7 @@ const DocumentCard = ({ document }) => {
     fetchLikes();
     fetchComments();
     fetchUploaderAvatar();
+    if (currentUser) fetchFavorite();
   }, [document.id]);
 
   const fetchUploaderAvatar = async () => {
@@ -40,7 +43,45 @@ const DocumentCard = ({ document }) => {
     }
   };
 
+  const fetchFavorite = async () => {
+    if (!currentUser?.email) return;
+    try {
+      const { data } = await supabase
+        .from('document_favorites')
+        .select('id')
+        .eq('document_id', document.id)
+        .eq('user_email', currentUser.email)
+        .maybeSingle();
+      setIsFavorited(!!data);
+    } catch (err) {
+      console.error("Favori durumu çekilemedi:", err);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!currentUser) { alert("Favori eklemek için giriş yapmalısınız."); return; }
+    setIsFavoriting(true);
+    try {
+      if (isFavorited) {
+        await supabase.from('document_favorites')
+          .delete()
+          .eq('document_id', document.id)
+          .eq('user_email', currentUser.email);
+        setIsFavorited(false);
+      } else {
+        await supabase.from('document_favorites')
+          .insert([{ document_id: document.id, user_email: currentUser.email }]);
+        setIsFavorited(true);
+      }
+    } catch (err) {
+      console.error("Favori değiştirme başarısız:", err);
+    } finally {
+      setIsFavoriting(false);
+    }
+  };
+
   const fetchComments = async () => {
+
     try {
       const { data, error } = await supabase
         .from('document_comments')
@@ -288,6 +329,27 @@ const DocumentCard = ({ document }) => {
               className={isLiking ? 'animate-pulse' : ''} 
             />
             <span style={{ fontWeight: '500' }}>{likesCount}</span>
+          </button>
+
+          {/* Favori Yıldız Butonu */}
+          <button
+            onClick={toggleFavorite}
+            disabled={isFavoriting}
+            title={isFavorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: isFavorited ? '#f59e0b' : 'var(--color-text-muted)',
+              transition: 'all 0.2s ease',
+              padding: '0.25rem 0.5rem',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <Star size={20} fill={isFavorited ? 'currentColor' : 'none'} />
           </button>
 
           <button 

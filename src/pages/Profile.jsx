@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { User, FileText, Trash2, Calendar, Download, Eye, Heart } from 'lucide-react';
+import { User, FileText, Trash2, Calendar, Download, Eye, Heart, Star } from 'lucide-react';
 import './Profile.css';
 
 const Profile = () => {
   const [myDocuments, setMyDocuments] = useState([]);
+  const [favoriteDocuments, setFavoriteDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -15,6 +16,7 @@ const Profile = () => {
     if (currentUser) {
       fetchMyDocuments();
       fetchUserAvatar();
+      fetchFavorites();
     }
   }, []);
 
@@ -43,7 +45,25 @@ const Profile = () => {
     }
   };
 
+  const fetchFavorites = async () => {
+    if (!currentUser?.email) return;
+    try {
+      const { data, error } = await supabase
+        .from('document_favorites')
+        .select('documents(*)')
+        .eq('user_email', currentUser.email)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setFavoriteDocuments(data.map(f => f.documents).filter(Boolean));
+      }
+    } catch (err) {
+      console.error("Favoriler yüklenemedi:", err);
+    }
+  };
+
   const fetchMyDocuments = async () => {
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -206,6 +226,44 @@ const Profile = () => {
       </div>
 
       <div className="profile-content">
+        {/* ⭐ FAVORİLERİM BÖLÜMÜ */}
+        {favoriteDocuments.length > 0 && (
+          <div style={{ marginBottom: '2.5rem' }}>
+            <div className="section-header">
+              <h2><Star size={24} style={{ color: '#f59e0b' }} /> Favorilerim</h2>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{favoriteDocuments.length} belge</span>
+            </div>
+            <div className="my-docs-grid">
+              {favoriteDocuments.map((doc) => (
+                <div key={doc.id} className="doc-card glass-panel profile-doc-card" style={{ borderLeft: '3px solid #f59e0b' }}>
+                  <div className="doc-card-header">
+                    <div className="doc-meta-top">
+                      {getFormatBadge(doc.type)}
+                      <span className="category-badge">{doc.category}</span>
+                    </div>
+                  </div>
+                  <div className="doc-card-body">
+                    <h3 className="doc-title">{doc.title}</h3>
+                    <div className="doc-info">
+                      <div className="info-item">
+                        <Calendar size={14} />
+                        <span>{new Date(doc.created_at).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="profile-doc-actions">
+                    {doc.file_url && (
+                      <button className="btn btn-outline btn-sm" onClick={() => window.open(doc.file_url, '_blank')}>
+                        <Download size={16} /> İndir
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="section-header">
           <h2><FileText size={24} /> Benim Yüklediğim Belgeler</h2>
         </div>
