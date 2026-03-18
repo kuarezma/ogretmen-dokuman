@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { User, FileText, Trash2, Calendar, Download, Eye, Heart, Star } from 'lucide-react';
+import { User, FileText, Trash2, Calendar, Download, Eye, Heart, Star, TrendingUp, MessageSquare } from 'lucide-react';
 import './Profile.css';
 
 const Profile = () => {
@@ -9,6 +9,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [userStats, setUserStats] = useState({ totalDownloads: 0, totalLikes: 0, totalComments: 0 });
   
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
@@ -17,8 +18,42 @@ const Profile = () => {
       fetchMyDocuments();
       fetchUserAvatar();
       fetchFavorites();
+      fetchUserStats();
     }
   }, []);
+
+  const fetchUserStats = async () => {
+    if (!currentUser?.username) return;
+    try {
+      const { data: docs } = await supabase
+        .from('documents')
+        .select('download_count, likes_count')
+        .eq('uploaded_by', currentUser.username);
+      
+      let totalDownloads = 0;
+      let totalLikes = 0;
+      
+      if (docs) {
+        docs.forEach(doc => {
+          totalDownloads += doc.download_count || 0;
+          totalLikes += doc.likes_count || 0;
+        });
+      }
+
+      const { count: commentCount } = await supabase
+        .from('document_comments')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_name', currentUser.username);
+
+      setUserStats({
+        totalDownloads,
+        totalLikes,
+        totalComments: commentCount || 0
+      });
+    } catch (err) {
+      console.error("Kullanıcı istatistikleri çekilemedi:", err);
+    }
+  };
 
   const fetchUserAvatar = async () => {
     try {
@@ -220,7 +255,19 @@ const Profile = () => {
         <div className="profile-stats">
           <div className="stat-card">
             <span className="stat-value">{myDocuments.length}</span>
-            <span className="stat-label">Yüklenen Belge</span>
+            <span className="stat-label">Belge</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-value">{userStats.totalDownloads}</span>
+            <span className="stat-label">İndirme</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-value">{userStats.totalLikes}</span>
+            <span className="stat-label">Beğeni</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-value">{userStats.totalComments}</span>
+            <span className="stat-label">Yorum</span>
           </div>
         </div>
       </div>

@@ -22,13 +22,6 @@ const Stats = () => {
         .order('download_count', { ascending: false })
         .limit(10);
 
-      // En çok beğenilen belgeler (likes tablosu yok, likes_count al)
-      const { data: likedDocs } = await supabase
-        .from('documents')
-        .select('id, title, uploaded_by, type')
-        .order('likes_count', { ascending: false })
-        .limit(5);
-
       // En aktif yükleyiciler (belge sayısına göre)
       const { data: allDocs } = await supabase
         .from('documents')

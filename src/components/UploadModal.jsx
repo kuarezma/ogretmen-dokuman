@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { X, UploadCloud, FileText, CheckCircle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './AuthModal.css'; 
@@ -35,7 +35,6 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 

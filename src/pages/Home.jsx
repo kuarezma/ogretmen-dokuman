@@ -43,9 +43,8 @@ const Home = () => {
     }
   };
 
-  const handleSearch = async ({ searchTerm, format, grade, lesson, category }) => {
-    // Tüm filtreler boşsa direkt tüm listeyi göster
-    if (!searchTerm && format === 'all' && grade === 'Tüm Sınıflar' && category === 'Tüm Kategoriler') {
+  const handleSearch = async ({ searchTerm, format, grade, lesson, category, sortBy = 'newest', dateRange = 'all' }) => {
+    if (!searchTerm && format === 'all' && grade === 'Tüm Sınıflar' && category === 'Tüm Kategoriler' && dateRange === 'all') {
       setFilteredDocs(documents);
       setHasSearched(false);
       return;
@@ -57,33 +56,70 @@ const Home = () => {
     try {
       let query = supabase.from('documents').select('*');
 
-      // Arama terimi (title, topic veya uploaded_by içinde geçiyorsa)
       if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,topic.ilike.%${searchTerm}%,uploaded_by.ilike.%${searchTerm}%`);
       }
 
-      // Format filtresi
       if (format !== 'all') {
         query = query.eq('type', format);
       }
 
-      // Sınıf filtresi
       if (grade && grade !== 'Tüm Sınıflar') {
         query = query.eq('grade', grade);
       }
       
-      // Ders filtresi
       if (lesson && lesson !== 'Tüm Dersler') {
         query = query.eq('lesson', lesson);
       }
 
-      // Belge Türü (Kategori) filtresi
       if (category && category !== 'Tüm Kategoriler') {
         query = query.eq('category', category);
       }
 
-      // Sonuçları puana/zaman göre sırala (Yeni hedefler)
-      query = query.order('created_at', { ascending: false });
+      if (dateRange !== 'all') {
+        const now = new Date();
+        let startDate;
+        switch (dateRange) {
+          case 'today':
+            startDate = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+            break;
+          case 'week':
+            startDate = new Date(now.setDate(now.getDate() - 7)).toISOString();
+            break;
+          case 'month':
+            startDate = new Date(now.setMonth(now.getMonth() - 1)).toISOString();
+            break;
+          case 'year':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1)).toISOString();
+            break;
+        }
+        if (startDate) {
+          query = query.gte('created_at', startDate);
+        }
+      }
+
+      switch (sortBy) {
+        case 'newest':
+          query = query.order('created_at', { ascending: false });
+          break;
+        case 'oldest':
+          query = query.order('created_at', { ascending: true });
+          break;
+        case 'most_downloaded':
+          query = query.order('download_count', { ascending: false, nullsFirst: false });
+          break;
+        case 'most_liked':
+          query = query.order('likes_count', { ascending: false, nullsFirst: false });
+          break;
+        case 'title_asc':
+          query = query.order('title', { ascending: true });
+          break;
+        case 'title_desc':
+          query = query.order('title', { ascending: false });
+          break;
+        default:
+          query = query.order('created_at', { ascending: false });
+      }
 
       const { data, error } = await query;
       if (error) throw error;
@@ -92,7 +128,7 @@ const Home = () => {
         ...doc,
         description: doc.topic,
         uploader: doc.uploaded_by,
-        downloads: 0
+        downloads: doc.download_count || 0
       }));
 
       setFilteredDocs(mappedDocs);

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare, Star } from 'lucide-react';
+import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare, Star, Share2, Check } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { toast } from 'react-hot-toast';
+import PreviewModal from './PreviewModal';
 import './DocumentCard.css';
 
 const DocumentCard = ({ document }) => {
@@ -10,6 +12,9 @@ const DocumentCard = ({ document }) => {
   const [uploaderAvatar, setUploaderAvatar] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isFavoriting, setIsFavoriting] = useState(false);
+  const [downloadCount, setDownloadCount] = useState(document.download_count || 0);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   
   // Yorum State'leri
   const [comments, setComments] = useState([]);
@@ -59,7 +64,7 @@ const DocumentCard = ({ document }) => {
   };
 
   const toggleFavorite = async () => {
-    if (!currentUser) { alert("Favori eklemek için giriş yapmalısınız."); return; }
+    if (!currentUser) { toast.error("Favori eklemek için giriş yapmalısınız."); return; }
     setIsFavoriting(true);
     try {
       if (isFavorited) {
@@ -68,13 +73,16 @@ const DocumentCard = ({ document }) => {
           .eq('document_id', document.id)
           .eq('user_email', currentUser.email);
         setIsFavorited(false);
+        toast.success('Favorilerden kaldırıldı');
       } else {
         await supabase.from('document_favorites')
           .insert([{ document_id: document.id, user_email: currentUser.email }]);
         setIsFavorited(true);
+        toast.success('Favorilere eklendi!');
       }
     } catch (err) {
       console.error("Favori değiştirme başarısız:", err);
+      toast.error('Favori işlemi başarısız oldu.');
     } finally {
       setIsFavoriting(false);
     }
@@ -119,7 +127,7 @@ const DocumentCard = ({ document }) => {
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!currentUser) {
-      alert("Yorum yapmak için giriş yapmalısınız.");
+      toast.error("Yorum yapmak için giriş yapmalısınız.");
       return;
     }
     if (!newComment.trim()) return;
@@ -138,12 +146,17 @@ const DocumentCard = ({ document }) => {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        setComments([...comments, data[0]]);
+        const newCommentWithAvatar = {
+          ...data[0],
+          user_avatar: uploaderAvatar
+        };
+        setComments([...comments, newCommentWithAvatar]);
         setNewComment("");
+        toast.success('Yorum eklendi!');
       }
     } catch (err) {
       console.error("Yorum ekleme başarısız:", err);
-      alert("Yorum eklenirken hata oluştu.");
+      toast.error('Yorum eklenirken hata oluştu.');
     } finally {
       setIsSubmitting(false);
     }
@@ -179,7 +192,7 @@ const DocumentCard = ({ document }) => {
 
   const handleLike = async () => {
     if (!currentUser) {
-      alert("Beğenmek için giriş yapmalısınız.");
+      toast.error("Beğenmek için giriş yapmalısınız.");
       return;
     }
     
@@ -187,7 +200,6 @@ const DocumentCard = ({ document }) => {
 
     try {
       if (isLiked) {
-        // Zaten beğenilmişse, beğeniyi kaldır 
         const { error } = await supabase
           .from('document_likes')
           .delete()
@@ -198,7 +210,6 @@ const DocumentCard = ({ document }) => {
           setLikesCount(prev => Math.max(0, prev - 1));
         }
       } else {
-        // Beğenilmemişse, yeni beğeni at
         const { error } = await supabase
           .from('document_likes')
           .insert([{ document_id: document.id, user_name: currentUser.username }]);
@@ -206,10 +217,12 @@ const DocumentCard = ({ document }) => {
         if (!error) {
           setIsLiked(true);
           setLikesCount(prev => prev + 1);
+          toast.success('Beğenildi!');
         }
       }
     } catch (err) {
       console.error("Beğeni işlemi başarısız", err);
+      toast.error('Beğeni işlemi başarısız oldu.');
     } finally {
       setIsLiking(false);
     }
@@ -232,27 +245,70 @@ const DocumentCard = ({ document }) => {
     );
   };
 
-  const handlePreview = () => {
+  const handlePreview = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!document.file_url) {
-      alert("Bu belgenin dosyası henüz yüklenmemiş.");
+      toast.error("Bu belgenin dosyası henüz yüklenmemiş.");
+      return;
+    }
+    setIsPreviewOpen(true);
+  };
+
+  const handleDownload = async () => {
+    if (!document.file_url) {
+      toast.error("Bu belgenin dosyası henüz yüklenmemiş.");
       return;
     }
     
-    // PDF ise direkt açılır, Word/Excel ise Office Online Viewer ile açılır
-    if (document.type.toLowerCase() === 'pdf') {
-       window.open(document.file_url, '_blank');
-    } else {
-       const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`;
-       window.open(viewerUrl, '_blank');
+    setIsDownloading(true);
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ download_count: (downloadCount || 0) + 1 })
+        .eq('id', document.id);
+      
+      if (!error) {
+        setDownloadCount(prev => (prev || 0) + 1);
+      }
+      
+      window.open(document.file_url, '_blank');
+      toast.success('Belge indirilmeye başlandı!');
+    } catch (err) {
+      console.error('İndirme hatası:', err);
+      window.open(document.file_url, '_blank');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
-  const handleDownload = () => {
-    if (!document.file_url) {
-      alert("Bu belgenin dosyası henüz yüklenmemiş.");
-      return;
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}?doc=${document.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: document.title,
+          text: `${document.title} - Öğretmen Döküman`,
+          url: shareUrl
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          await copyToClipboard(shareUrl);
+        }
+      }
+    } else {
+      await copyToClipboard(shareUrl);
     }
-    window.open(document.file_url, '_blank');
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Link kopyalandı!');
+    } catch {
+      toast.error('Link kopyalanamadı');
+    }
   };
 
   return (
@@ -373,11 +429,20 @@ const DocumentCard = ({ document }) => {
           </button>
 
           <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', flexWrap: 'wrap' }}>
+            <button 
+              className="btn btn-ghost btn-sm" 
+              onClick={handleShare}
+              title="Paylaş"
+              style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}
+            >
+              <Share2 size={16} />
+            </button>
             <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
               <Eye size={16} /> Önizle
             </button>
-            <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
-              <Download size={16} /> İndir
+            <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} disabled={isDownloading} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
+              {isDownloading ? <span className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }} /> : <Download size={16} />}
+              İndir {downloadCount > 0 && <span style={{ opacity: 0.8 }}>({downloadCount})</span>}
             </button>
           </div>
         </div>
@@ -463,6 +528,12 @@ const DocumentCard = ({ document }) => {
           )}
         </div>
       )}
+      
+      <PreviewModal 
+        isOpen={isPreviewOpen} 
+        onClose={() => setIsPreviewOpen(false)} 
+        document={document}
+      />
     </div>
   );
 };

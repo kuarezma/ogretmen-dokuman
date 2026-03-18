@@ -37,7 +37,6 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
 
     try {
       if (isLogin) {
-        // Supabase Auth Email/Password Girişi
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
@@ -49,7 +48,12 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
           return;
         }
 
-        // Kullanıcı adını users tablosundan çek
+        if (data.user && !data.user.email_confirmed_at) {
+          setError('Lütfen önce e-posta adresinizi doğrulayın. Doğrulama e-postası spam klasöründe olabilir.');
+          setIsLoading(false);
+          return;
+        }
+
         const { data: userData } = await supabase
           .from('users')
           .select('username')
@@ -67,14 +71,12 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
         onClose();
 
       } else {
-        // Kayıt İşlemi
         if (formData.username.length < 3 || formData.password.length < 6) {
           setError('Kullanıcı adı en az 3, şifre en az 6 karakter olmalıdır.');
           setIsLoading(false);
           return;
         }
 
-        // Önce kullanıcı adının alınıp alınmadığını kontrol edelim
         const { data: existingUser } = await supabase
           .from('users')
           .select('username')
@@ -87,10 +89,15 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
           return;
         }
 
-        // Supabase Auth Kayıt
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
+          options: {
+            data: {
+              username: formData.username
+            },
+            emailRedirectTo: window.location.origin
+          }
         });
 
         if (signUpError) {
@@ -103,11 +110,16 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
           return;
         }
 
-        // public.users tablosuna kullanıcı metadatası ekleyelim
+        if (authData?.user && !authData.user.email_confirmed_at) {
+          setError('Kayıt başarılı! Lütfen e-posta adresinize gönderilen doğrulama linkine tıklayın.');
+          setIsLoading(false);
+          return;
+        }
+
         await supabase.from('users').insert([{ 
           username: formData.username, 
           email: formData.email,
-          password: 'encrypted' // Gerçek şifre Auth tablosunda tutuluyor
+          password: 'encrypted'
         }]);
 
         const userObj = {
@@ -120,7 +132,7 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
         onLoginSuccess();
         onClose();
       }
-    } catch (err) {
+    } catch {
       setError('Bağlantı sırasında bir hata oluştu.');
     } finally {
       setIsLoading(false);

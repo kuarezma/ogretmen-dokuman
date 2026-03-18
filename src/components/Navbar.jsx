@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2 } from 'lucide-react';
+import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
 import { supabase } from '../supabaseClient';
@@ -9,8 +9,8 @@ import './Navbar.css';
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isDark, setIsDark] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -79,8 +79,16 @@ const Navbar = () => {
             <h1>Öğretmen<span> Döküman</span></h1>
           </Link>
 
-          <nav className="nav-actions">
-            {/* Dark Mode Toggle */}
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            title="Menü"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          <nav className={`nav-actions ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
             <button
               className="btn btn-ghost nav-btn dark-toggle"
               onClick={toggleDarkMode}
@@ -90,46 +98,46 @@ const Navbar = () => {
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            {/* İstatistik Linki */}
             <Link
               to="/stats"
               className="btn btn-ghost nav-btn"
               title="İstatistikler"
+              onClick={() => setIsMobileMenuOpen(false)}
               style={{ padding: '0.4rem 0.6rem' }}
             >
               <BarChart2 size={18} />
+              <span className="mobile-nav-text">İstatistikler</span>
             </Link>
 
             {user ? (
               <>
-                <span className="welcome-text">
-                  Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
-                </span>
-                {/* Mobil için her zaman görünen profil ikonu */}
                 <Link
                   to="/profile"
-                  className="btn btn-ghost nav-btn profile-mobile-btn"
-                  title={user.username}
+                  className="btn btn-ghost nav-btn"
+                  onClick={() => setIsMobileMenuOpen(false)}
                   style={{ padding: '0.4rem 0.6rem' }}
                 >
                   <User size={18} />
+                  <span className="mobile-nav-text">Profil</span>
                 </Link>
                 <button 
                   className="btn btn-outline nav-btn"
-                  onClick={() => setIsUploadOpen(true)}
+                  onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
                 >
                   <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
+                  <span className="mobile-nav-text">Belge Yükle</span>
                 </button>
                 <button className="btn btn-ghost nav-btn" onClick={handleLogout}>
                   <LogOut size={18} />
+                  <span className="mobile-nav-text">Çıkış Yap</span>
                 </button>
               </>
             ) : (
               <>
-                <button className="btn btn-ghost nav-btn" onClick={handleLoginClick}>
+                <button className="btn btn-ghost nav-btn" onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}>
                   Giriş Yap
                 </button>
-                <button className="btn btn-primary nav-btn" onClick={handleRegisterClick}>
+                <button className="btn btn-primary nav-btn" onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}>
                   <User size={18} /> Kayıt Ol
                 </button>
               </>

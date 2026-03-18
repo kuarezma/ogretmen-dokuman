@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Globe, Database } from 'lucide-react';
+import { Search, Globe, Database, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import './SearchBar.css';
 
 const GRADE_LESSONS = {
@@ -22,6 +22,23 @@ const GRADE_LESSONS = {
 
 const DOC_CATEGORIES = ["Tüm Kategoriler", "Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
 
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'En Yeni' },
+  { value: 'oldest', label: 'En Eski' },
+  { value: 'most_downloaded', label: 'En Çok İndirilen' },
+  { value: 'most_liked', label: 'En Çok Beğenilen' },
+  { value: 'title_asc', label: 'Başlık (A-Z)' },
+  { value: 'title_desc', label: 'Başlık (Z-A)' },
+];
+
+const DATE_RANGE_OPTIONS = [
+  { value: 'all', label: 'Tüm Zamanlar' },
+  { value: 'today', label: 'Bugün' },
+  { value: 'week', label: 'Bu Hafta' },
+  { value: 'month', label: 'Bu Ay' },
+  { value: 'year', label: 'Bu Yıl' },
+];
+
 const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [format, setFormat] = useState('all');
@@ -29,6 +46,9 @@ const SearchBar = ({ onSearch }) => {
   const [lesson, setLesson] = useState('Tüm Dersler');
   const [category, setCategory] = useState('Tüm Kategoriler');
   const [searchType, setSearchType] = useState('internal');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [sortBy, setSortBy] = useState('newest');
+  const [dateRange, setDateRange] = useState('all');
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -36,8 +56,7 @@ const SearchBar = ({ onSearch }) => {
       const query = encodeURIComponent(`${searchTerm} öğretmen belge eğitim`);
       window.open(`https://www.google.com/search?q=${query}`, '_blank');
     } else {
-      // Yenilenmiş parametreleri yolla
-      onSearch({ searchTerm, format, grade, lesson, category });
+      onSearch({ searchTerm, format, grade, lesson, category, sortBy, dateRange });
     }
   };
 
@@ -134,10 +153,54 @@ const SearchBar = ({ onSearch }) => {
             </div>
           </div>
         )}
-        
-        <button type="submit" className="btn btn-primary search-btn">
-          {searchType === 'google' ? 'Google\'da Bul' : 'Bul'}
-        </button>
+
+        <div className="search-actions">
+          {searchType === 'internal' && (
+            <button 
+              type="button" 
+              className={`btn btn-ghost advanced-toggle ${showAdvanced ? 'active' : ''}`}
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              <SlidersHorizontal size={18} />
+              Gelişmiş
+              <ChevronDown size={16} className={showAdvanced ? 'rotate-180' : ''} />
+            </button>
+          )}
+          
+          <button type="submit" className="btn btn-primary search-btn">
+            {searchType === 'google' ? 'Google\'da Bul' : 'Bul'}
+          </button>
+        </div>
+
+        {showAdvanced && searchType === 'internal' && (
+          <div className="advanced-filters animate-fade-in">
+            <div className="advanced-filter-group">
+              <label>Sıralama</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                className="filter-select"
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="advanced-filter-group">
+              <label>Tarih</label>
+              <select 
+                value={dateRange} 
+                onChange={(e) => setDateRange(e.target.value)}
+                className="filter-select"
+              >
+                {DATE_RANGE_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
