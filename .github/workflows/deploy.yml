@@ -50,7 +50,7 @@ jobs:
     name: Supabase migrations (optional)
     runs-on: ubuntu-latest
     needs: vercel-deploy
-    if: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_ANON_KEY != '' }}
+    if: ${{ false }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
