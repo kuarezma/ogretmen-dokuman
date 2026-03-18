@@ -1,0 +1,64 @@
+name: Deploy to Vercel and Supabase
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  vercel-deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Deploy to Vercel
+        id: vercel
+        uses: vercel/action@v2
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: --prod
+
+      - name: Health check post-deploy
+        if: always()
+        run: |
+          URL="${{ steps.vercel.outputs.preview-url || steps.vercel.outputs.url || '' }}"
+          if [ -n "$URL" ]; then
+            echo "Running health check against $URL"
+            curl -sSf "$URL/api/supabase-test" || { echo "Health check failed for $URL"; exit 1; }
+          else
+            echo "No URL available from Vercel deploy; skipping health check"
+          fi
+
+  supabase-prepare:
+    name: Supabase migrations (optional)
+    runs-on: ubuntu-latest
+    needs: vercel-deploy
+    if: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_ANON_KEY != '' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install Supabase CLI
+        run: npm i -g supabase
+      - name: Run migrations (placeholder)
+        run: |
+          echo "If you provide SUPABASE_SERVICE_ROLE_KEY or a DATABASE_URL, migrations would run here."
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
