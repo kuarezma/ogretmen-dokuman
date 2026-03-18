@@ -9,6 +9,7 @@ const Home = () => {
   const [documents, setDocuments] = useState([]);
   const [filteredDocs, setFilteredDocs] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
 
   // Kategori Hiyerarşisi State Yönetimi (0: Sınıf Seç, 1: Ders Seç, 2: Kategori Seç, 3: Belgeler)
@@ -20,6 +21,7 @@ const Home = () => {
   }, []);
 
   const fetchDocuments = async () => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('documents')
@@ -28,18 +30,19 @@ const Home = () => {
 
       if (error) throw error;
 
-      // Supabase'den gelen verileri UI ile uyumlu hale getir
       const mappedDocs = (data || []).map(doc => ({
         ...doc,
         description: doc.topic,
         uploader: doc.uploaded_by,
-        downloads: 0 // Henüz tabloya eklenmediği için statik default
+        downloads: 0
       }));
 
       setDocuments(mappedDocs);
       setFilteredDocs(mappedDocs);
     } catch (err) {
       console.error('Veritabanından belgeler çekilemedi:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -250,9 +253,24 @@ const Home = () => {
           </div>
 
           {isSearching ? (
-            <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Belgeler aranıyor...</p>
+            <div className="documents-grid">
+              {[1,2,3].map((i) => (
+                <div key={i} className="skeleton-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <div className="skeleton skeleton-circle"></div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <div className="skeleton" style={{ width: '50px', height: '24px', borderRadius: '999px' }}></div>
+                      <div className="skeleton" style={{ width: '80px', height: '24px', borderRadius: '999px' }}></div>
+                    </div>
+                  </div>
+                  <div className="skeleton skeleton-line title long"></div>
+                  <div className="skeleton skeleton-line medium"></div>
+                  <div className="skeleton skeleton-line short"></div>
+                  <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+                    <div className="skeleton skeleton-line short"></div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredDocs.length > 0 ? (
             <div className="documents-grid">
@@ -280,7 +298,35 @@ const Home = () => {
           {folderLevel === 0 && (
             <>
               {/* SON EKLENEN VİTRİNİ */}
-              {recentDocuments.length > 0 && (
+              {isLoading ? (
+                <section className="category-section highlight-section" style={{ marginBottom: '2.5rem' }}>
+                  <div className="section-header">
+                    <h3 style={{ color: 'var(--color-primary)' }}>
+                      <Sparkles size={24} /> Yeni Yüklenen Belgeler
+                      <span className="results-badge" style={{ marginLeft: 'auto' }}>Yeni</span>
+                    </h3>
+                  </div>
+                  <div className="documents-grid">
+                    {[1,2,3].map((i) => (
+                      <div key={i} className="skeleton-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                          <div className="skeleton skeleton-circle"></div>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <div className="skeleton" style={{ width: '50px', height: '24px', borderRadius: '999px' }}></div>
+                            <div className="skeleton" style={{ width: '80px', height: '24px', borderRadius: '999px' }}></div>
+                          </div>
+                        </div>
+                        <div className="skeleton skeleton-line title long"></div>
+                        <div className="skeleton skeleton-line medium"></div>
+                        <div className="skeleton skeleton-line short"></div>
+                        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+                          <div className="skeleton skeleton-line short"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : recentDocuments.length > 0 && (
                 <section className="category-section highlight-section" style={{ marginBottom: '2.5rem' }}>
                   <div className="section-header">
                     <h3 style={{ color: 'var(--color-primary)' }}>
@@ -301,25 +347,25 @@ const Home = () => {
 
               {/* SINIF KLASÖRLERİ */}
               <section className="category-section">
-                 <div className="section-header">
-                   <h3><Folder size={24} fill="currentColor" fillOpacity="0.2" style={{ color: 'var(--color-primary)', marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }}/> Arşiv Klasörleri</h3>
-                 </div>
-                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                    {Object.keys(GRADE_LESSONS).map((grade) => {
-                      if (grade === "Tüm Sınıflar") return null; // Bunu klasör olarak gösterme
-                      return (
-                      <div 
-                        key={grade} 
-                        onClick={() => handleGradeClick(grade)}
-                        className="folder-card glass-panel hover-effect"
-                        style={{ padding: '1.5rem', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-lg)' }}
-                      >
-                        <Folder size={48} color="var(--color-primary)" fill="currentColor" fillOpacity="0.15" style={{ margin: '0 auto 1rem', opacity: 0.9 }} />
-                        <h4 style={{ margin: 0, color: 'var(--color-text)' }}>{grade}</h4>
-                      </div>
-                    )})}
-                 </div>
-              </section>
+                  <div className="section-header">
+                    <h3><Folder size={24} fill="currentColor" fillOpacity="0.2" style={{ color: 'var(--color-primary)', marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }}/> Arşiv Klasörleri</h3>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                     {Object.keys(GRADE_LESSONS).map((grade) => {
+                       if (grade === "Tüm Sınıflar") return null;
+                       return (
+                       <div 
+                         key={grade} 
+                         onClick={() => handleGradeClick(grade)}
+                         className="folder-card glass-panel hover-effect"
+                         style={{ padding: '1.5rem', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-lg)', minHeight: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                       >
+                         <Folder size={48} color="var(--color-primary)" fill="currentColor" fillOpacity="0.15" style={{ margin: '0 auto 1rem', opacity: 0.9 }} />
+                         <h4 style={{ margin: 0, color: 'var(--color-text)' }}>{grade}</h4>
+                       </div>
+                     })}
+                  </div>
+               </section>
             </>
           )}
 
@@ -332,7 +378,7 @@ const Home = () => {
                       key={lesson} 
                       onClick={() => handleLessonClick(lesson)}
                       className="folder-card glass-panel hover-effect"
-                      style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', borderRadius: 'var(--radius-lg)' }}
+                      style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', borderRadius: 'var(--radius-lg)', minHeight: '70px' }}
                     >
                       <Folder size={32} color="var(--color-warning)" fill="currentColor" fillOpacity="0.15" style={{ opacity: 0.9 }} />
                       <h4 style={{ margin: 0, color: 'var(--color-text)', fontSize: '1.05rem' }}>{lesson}</h4>
@@ -351,7 +397,7 @@ const Home = () => {
                       key={cat} 
                       onClick={() => handleCategoryClick(cat)}
                       className="folder-card glass-panel hover-effect"
-                      style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', borderRadius: 'var(--radius-lg)' }}
+                      style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', borderRadius: 'var(--radius-lg)', minHeight: '70px' }}
                     >
                       <Folder size={32} color="#10b981" fill="currentColor" fillOpacity="0.15" style={{ opacity: 0.9 }} />
                       <h4 style={{ margin: 0, color: 'var(--color-text)', fontSize: '0.95rem' }}>{cat}</h4>

@@ -80,6 +80,7 @@
 .profile-stats {
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .stat-card {
@@ -89,7 +90,8 @@
   background: var(--color-surface);
   padding: 1rem 1.5rem;
   border-radius: var(--radius-md);
-  min-width: 120px;
+  min-width: 100px;
+  min-height: 80px;
 }
 
 .stat-value {
@@ -97,6 +99,8 @@
   font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 0.25rem;
+  line-height: 1;
+  min-height: 2.1rem;
 }
 
 .stat-label {
@@ -104,6 +108,7 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .section-header {
