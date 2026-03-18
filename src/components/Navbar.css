@@ -12,20 +12,22 @@
   align-items: center;
   justify-content: space-between;
   height: 80px;
+  gap: 2rem;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .brand-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background-color: var(--color-primary-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -51,17 +53,20 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .welcome-text {
   font-size: 0.95rem;
   color: var(--color-text-muted);
   margin-right: 0.5rem;
+  white-space: nowrap;
 }
 
 .nav-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .mobile-menu-btn {
