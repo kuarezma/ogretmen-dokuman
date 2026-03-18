@@ -157,4 +157,7 @@ app.get('/kayit', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ind
 app.get('/yukle', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/belgeler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-app.listen(PORT, () => console.log('Öğretmen Döküman: http://localhost:' + PORT));
+if (require.main === module) {
+  app.listen(PORT, () => console.log('Öğretmen Döküman: http://localhost:' + PORT));
+}
+module.exports = app;
