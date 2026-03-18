@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Öğretmen Döküman – Word, Excel, PDF</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    window.OGRETMEN_DOKUMAN = window.OGRETMEN_DOKUMAN || {};
+    window.OGRETMEN_DOKUMAN.googleCx = ''; // Site içi Google arama: https://programmablesearchengine.google.com/ → cx değerini buraya yapıştırın.
+  </script>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="/" class="logo" data-view="home">Öğretmen Döküman</a>
+    <nav class="nav">
+        <a href="/" class="nav-link" data-view="home">Ana Sayfa</a>
+        <a href="/belgeler" class="nav-link" data-view="documents">Belgeler</a>
+        <a href="/google" class="nav-link" data-view="google">Google'da Ara</a>
+        <span id="nav-upload-wrap" class="hidden">
+          <a href="/yukle" class="nav-link" data-view="upload">Yükle</a>
+        </span>
+        <span id="nav-auth-wrap">
+          <a href="/giris" class="btn btn-ghost" data-view="login">Giriş</a>
+          <a href="/kayit" class="btn btn-primary" data-view="register">Kayıt</a>
+        </span>
+        <span id="nav-user-wrap" class="hidden">
+          <span class="user-name"></span>
+          <button type="button" class="btn btn-ghost" id="btn-logout">Çıkış</button>
+        </span>
+        <!-- Theme toggle -->
+        <button id="theme-toggle" class="btn btn-ghost" aria-label="Karanlık modu değiştir" title="Karanlık modu değiştir" style="margin-left:auto; display:inline-flex; align-items:center; justify-content:center;">
+          <span id="theme-icon" aria-hidden="true">🌙</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Ana Sayfa / Arama -->
+    <section id="view-home" class="view">
+      <div class="hero">
+        <div class="container">
+          <h1 class="hero-title">Dökümanlarınızı bulun, paylaşın</h1>
+          <p class="hero-sub">Word, Excel ve PDF ile yazılı, test, yıllık plan, proje ve daha fazlası.</p>
+          <form class="search-form" id="search-form">
+            <div class="search-row">
+              <select id="search-type" class="input">
+                <option value="tumu">Tüm türler</option>
+                <option value="word">Word</option>
+                <option value="excel">Excel</option>
+                <option value="pdf">PDF</option>
+              </select>
+              <select id="search-category" class="input">
+                <option value="tumu">Tüm kategoriler</option>
+                <option value="yazili">Yazılı</option>
+                <option value="test">Test</option>
+                <option value="yillik_plan">Yıllık Plan</option>
+                <option value="proje">Proje</option>
+                <option value="sunum">Sunum</option>
+                <option value="etkinlik">Etkinlik</option>
+                <option value="diger">Diğer</option>
+              </select>
+              <input type="search" id="search-q" class="input input-search" placeholder="Ne aramak istiyorsunuz?" autocomplete="off">
+              <button type="submit" class="btn btn-primary btn-search">Ara</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="container section">
+        <h2 class="section-title">Son eklenen belgeler</h2>
+        <div id="home-results" class="card-grid"></div>
+        <p id="home-empty" class="empty-msg hidden">Henüz belge yok. Giriş yapıp ilk belgeyi siz yükleyin.</p>
+      </div>
+    </section>
+
+    <!-- Belgeler (arama sonuçları) -->
+    <section id="view-documents" class="view hidden">
+      <div class="container section">
+        <h1 class="page-title">Belge ara</h1>
+        <form class="search-form inline" id="search-form-docs">
+          <select id="search-type-docs" class="input"></select>
+          <select id="search-category-docs" class="input"></select>
+          <input type="search" id="search-q-docs" class="input input-search" placeholder="Arama metni">
+          <button type="submit" class="btn btn-primary">Ara</button>
+        </form>
+        <div id="documents-results" class="card-grid"></div>
+        <p id="documents-empty" class="empty-msg hidden">Arama kriterlerinize uygun belge bulunamadı.</p>
+      </div>
+    </section>
+
+    <!-- Google'da Ara (site içinde entegre) -->
+    <section id="view-google" class="view hidden">
+      <div class="container section">
+        <h1 class="page-title">Google'da Ara</h1>
+        <p class="hero-sub" style="margin-bottom: 1rem;">Arama sonuçları sitede gösterilir.</p>
+        <div id="google-search-fallback" class="google-fallback">
+          <form class="search-form inline" id="google-fallback-form">
+            <input type="search" id="google-fallback-q" class="input input-search" placeholder="Google'da ara..." required>
+            <button type="submit" class="btn btn-primary">Google'da Ara</button>
+          </form>
+          <p class="form-message" style="margin-top: 1rem;">Arama yeni sekmede açılır. Sonuçları doğrudan sitede göstermek için <a href="https://programmablesearchengine.google.com/" target="_blank" rel="noopener">Google Programmable Search Engine</a> oluşturup <code>index.html</code> içindeki <code>googleCx</code> değerini doldurun.</p>
+        </div>
+        <div id="google-cse-wrap" class="google-cse-wrap hidden">
+          <div class="gcse-search"></div>
+          <div class="gcse-searchresults-only"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Giriş -->
+    <section id="view-login" class="view hidden">
+      <div class="container form-section">
+        <h1 class="page-title">Giriş yap</h1>
+        <form class="auth-form" id="form-login">
+          <label class="label">Kullanıcı adı</label>
+          <input type="text" name="username" class="input" required autocomplete="username">
+          <label class="label">Şifre</label>
+          <input type="password" name="password" class="input" required autocomplete="current-password">
+          <button type="submit" class="btn btn-primary btn-block">Giriş yap</button>
+          <p class="form-footer">Hesabınız yok mu? <a href="/kayit" data-view="register">Kayıt olun</a></p>
+        </form>
+        <p id="login-message" class="form-message hidden"></p>
+      </div>
+    </section>
+
+    <!-- Kayıt -->
+    <section id="view-register" class="view hidden">
+      <div class="container form-section">
+        <h1 class="page-title">Kayıt ol</h1>
+        <form class="auth-form" id="form-register">
+          <label class="label">Kullanıcı adı</label>
+          <input type="text" name="username" class="input" required autocomplete="username">
+          <label class="label">E-posta (isteğe bağlı)</label>
+          <input type="email" name="email" class="input" autocomplete="email">
+          <label class="label">Şifre</label>
+          <input type="password" name="password" class="input" required autocomplete="new-password" minlength="6">
+          <button type="submit" class="btn btn-primary btn-block">Kayıt ol</button>
+          <p class="form-footer">Zaten hesabınız var mı? <a href="/giris" data-view="login">Giriş yapın</a></p>
+        </form>
+        <p id="register-message" class="form-message hidden"></p>
+      </div>
+    </section>
+
+    <!-- Yükle -->
+    <section id="view-upload" class="view hidden">
+      <div class="container form-section">
+        <h1 class="page-title">Belge yükle</h1>
+        <form class="upload-form" id="form-upload">
+          <label class="label">Başlık</label>
+          <input type="text" name="title" class="input" required placeholder="Örn: 9. Sınıf Matematik 1. Yazılı">
+          <label class="label">Kategori</label>
+          <select name="category" class="input">
+            <option value="yazili">Yazılı</option>
+            <option value="test">Test</option>
+            <option value="yillik_plan">Yıllık Plan</option>
+            <option value="proje">Proje</option>
+            <option value="sunum">Sunum</option>
+            <option value="etkinlik">Etkinlik</option>
+            <option value="diger">Diğer</option>
+          </select>
+          <label class="label">Belge türü</label>
+          <select name="file_type" class="input">
+            <option value="word">Word</option>
+            <option value="excel">Excel</option>
+            <option value="pdf">PDF</option>
+          </select>
+          <label class="label">Açıklama (isteğe bağlı)</label>
+          <textarea name="description" class="input textarea" rows="3" placeholder="Kısa açıklama"></textarea>
+          <label class="label">Dosya</label>
+          <input type="file" name="file" class="input file-input" accept=".doc,.docx,.xls,.xlsx,.pdf" required>
+          <button type="submit" class="btn btn-primary btn-block">Yükle</button>
+        </form>
+        <p id="upload-message" class="form-message hidden"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Öğretmen Döküman – Word, Excel, PDF dökümanlarınızı arayın ve paylaşın.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
