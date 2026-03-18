@@ -341,112 +341,73 @@ const DocumentCard = ({ document }) => {
         <p className="doc-desc">{document.description}</p>
       </div>
       
-      <div className="doc-card-footer">
-        <div className="doc-info">
-          <div className="info-item">
-            {uploaderAvatar ? (
-              <img 
-                src={uploaderAvatar} 
-                alt={document.uploader} 
-                style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }} 
-              />
-            ) : (
-              <UserIcon size={14} />
-            )}
-            <span>{document.uploader}</span>
+        <div className="doc-card-footer">
+          <div className="doc-info">
+            <div className="info-item">
+              {uploaderAvatar ? (
+                <img 
+                  src={uploaderAvatar} 
+                  alt={document.uploader} 
+                  style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }} 
+                />
+              ) : (
+                <UserIcon size={14} />
+              )}
+              <span>{document.uploader}</span>
+            </div>
+            <div className="info-item">
+              <Calendar size={14} />
+              <span>{document.date}</span>
+            </div>
           </div>
-          <div className="info-item">
-            <Calendar size={14} />
-            <span>{document.date}</span>
-          </div>
-        </div>
-        
-        <div className="doc-actions-container" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
-          <button 
-            className={`btn-icon like-btn ${isLiked ? 'liked' : ''}`} 
-            onClick={handleLike}
-            disabled={isLiking}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.25rem', 
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: isLiked ? 'var(--color-danger)' : 'var(--color-text-muted)',
-              transition: 'all 0.2s ease',
-              padding: '0.25rem 0.5rem',
-              borderRadius: 'var(--radius-md)'
-            }}
-          >
-            <Heart 
-              size={20} 
-              fill={isLiked ? 'currentColor' : 'none'} 
-              className={isLiking ? 'animate-pulse' : ''} 
-            />
-            <span style={{ fontWeight: '500' }}>{likesCount}</span>
-          </button>
+          
+          <div className="doc-card-actions">
+            <div className="doc-card-interactions">
+              <button 
+                className={`interaction-btn ${isLiked ? 'liked' : ''}`} 
+                onClick={handleLike}
+                disabled={isLiking}
+              >
+                <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
+                <span>{likesCount}</span>
+              </button>
 
-          {/* Favori Yıldız Butonu */}
-          <button
-            onClick={toggleFavorite}
-            disabled={isFavoriting}
-            title={isFavorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: isFavorited ? '#f59e0b' : 'var(--color-text-muted)',
-              transition: 'all 0.2s ease',
-              padding: '0.25rem 0.5rem',
-              borderRadius: 'var(--radius-md)'
-            }}
-          >
-            <Star size={20} fill={isFavorited ? 'currentColor' : 'none'} />
-          </button>
+              <button
+                className={`interaction-btn ${isFavorited ? 'favorited' : ''}`}
+                onClick={toggleFavorite}
+                disabled={isFavoriting}
+                title={isFavorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+              >
+                <Star size={18} fill={isFavorited ? 'currentColor' : 'none'} />
+              </button>
 
-          <button 
-            className="btn-icon comment-toggle-btn" 
-            onClick={() => setShowComments(!showComments)}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.25rem', 
-              background: showComments ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: showComments ? 'var(--color-primary)' : 'var(--color-text-muted)',
-              transition: 'all 0.2s ease',
-              padding: '0.25rem 0.5rem',
-              borderRadius: 'var(--radius-md)'
-            }}
-          >
-            <MessageSquare size={20} />
-            <span style={{ fontWeight: '500' }}>{comments.length}</span>
-          </button>
+              <button 
+                className={`interaction-btn ${showComments ? 'comments-active' : ''}`} 
+                onClick={() => setShowComments(!showComments)}
+              >
+                <MessageSquare size={18} />
+                <span>{comments.length}</span>
+              </button>
+            </div>
 
-          <div className="doc-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', flexWrap: 'wrap' }}>
-            <button 
-              className="btn btn-ghost btn-sm" 
-              onClick={handleShare}
-              title="Paylaş"
-              style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}
-            >
-              <Share2 size={16} />
-            </button>
-            <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
-              <Eye size={16} /> Önizle
-            </button>
-            <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} disabled={isDownloading} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
-              {isDownloading ? <span className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }} /> : <Download size={16} />}
-              İndir {downloadCount > 0 && <span style={{ opacity: 0.8 }}>({downloadCount})</span>}
-            </button>
+            <div className="doc-card-buttons">
+              <button 
+                className="btn btn-ghost btn-sm share-btn" 
+                onClick={handleShare}
+                title="Paylaş"
+              >
+                <Share2 size={16} />
+              </button>
+              <button className="btn btn-outline btn-sm dl-btn" onClick={handlePreview}>
+                <Eye size={16} /> Önizle
+              </button>
+              <button className="btn btn-primary btn-sm dl-btn" onClick={handleDownload} disabled={isDownloading}>
+                {isDownloading ? <span className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }} /> : <Download size={16} />}
+                İndir{downloadCount > 0 && ` (${downloadCount})`}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       
       {/* Yorumlar Bölümü (Açılır Kapanır) */}
       {showComments && (
