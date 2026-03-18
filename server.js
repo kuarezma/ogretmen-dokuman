@@ -4,14 +4,12 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
- const db = require('./database');
- const supabase = require('./supabaseClient');
+const supabase = require('./supabaseClient');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
 
-// Dosya yükleme: uploads klasörüne, orijinal isim + tarih
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOADS_DIR),
   filename: (req, file, cb) => {
@@ -19,72 +17,83 @@ const storage = multer.diskStorage({
     cb(null, safe);
   }
 });
-const upload = multer({ storage, limits: { fileSize: 25 * 1024 * 1024 } }); // 25MB
+const upload = multer({ storage, limits: { fileSize: 25 * 1024 * 1024 } });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Basit oturum: cookie'de userId
 function getUserId(req) {
   const sid = req.cookies?.session;
   if (!sid) return null;
-  const row = db.prepare('SELECT user_id FROM sessions WHERE id = ?').get(sid);
-  return row ? row.user_id : null;
+  return sid;
+}
+
+async function getUserFromSession(sid) {
+  if (!sid) return null;
+  const { data } = await supabase.from('sessions').select('user_id, users(id, username, email)').eq('id', sid).single();
+  return data;
 }
 
 // --- API: Kayıt
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { username, password, email } = req.body || {};
   if (!username || !password) {
     return res.status(400).json({ ok: false, message: 'Kullanıcı adı ve şifre gerekli.' });
   }
   const hash = bcrypt.hashSync(password, 10);
   try {
-    db.prepare('INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)').run(username, hash, email || null);
+    const { error } = await supabase.from('users').insert({ username, password_hash: hash, email: email || null });
+    if (error) {
+      if (error.code === '23505') return res.status(400).json({ ok: false, message: 'Bu kullanıcı adı zaten kullanılıyor.' });
+      return res.status(500).json({ ok: false, message: error.message });
+    }
     res.json({ ok: true, message: 'Kayıt başarılı. Giriş yapabilirsiniz.' });
   } catch (e) {
-    if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
-      return res.status(400).json({ ok: false, message: 'Bu kullanıcı adı zaten kullanılıyor.' });
     res.status(500).json({ ok: false, message: 'Kayıt sırasında hata.' });
   }
 });
 
 // --- API: Giriş
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body || {};
-  const user = db.prepare('SELECT id, password_hash FROM users WHERE username = ?').get(username);
-  if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+  const { data: users, error } = await supabase.from('users').select('id, password_hash').eq('username', username);
+  if (error || !users || users.length === 0) {
+    return res.status(401).json({ ok: false, message: 'Kullanıcı adı veya şifre hatalı.' });
+  }
+  const user = users[0];
+  if (!bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ ok: false, message: 'Kullanıcı adı veya şifre hatalı.' });
   }
   const sessionId = require('crypto').randomBytes(24).toString('hex');
-  db.prepare('INSERT INTO sessions (id, user_id) VALUES (?, ?)').run(sessionId, user.id);
+  await supabase.from('sessions').insert({ id: sessionId, user_id: user.id });
   res.cookie('session', sessionId, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, path: '/' });
   res.json({ ok: true, message: 'Giriş başarılı.', username });
 });
 
 // --- API: Çıkış
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', async (req, res) => {
   const sid = req.cookies?.session;
-  if (sid) db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
+  if (sid) await supabase.from('sessions').delete().eq('id', sid);
   res.clearCookie('session', { path: '/' });
   res.json({ ok: true });
 });
 
 // --- API: Mevcut kullanıcı
-app.get('/api/me', (req, res) => {
-  const uid = getUserId(req);
-  if (!uid) return res.json({ user: null });
-  const user = db.prepare('SELECT id, username, email FROM users WHERE id = ?').get(uid);
-  res.json({ user: user || null });
+app.get('/api/me', async (req, res) => {
+  const sid = req.cookies?.session;
+  if (!sid) return res.json({ user: null });
+  const session = await getUserFromSession(sid);
+  if (!session) return res.json({ user: null });
+  res.json({ user: { id: session.users.id, username: session.users.username, email: session.users.email } });
 });
 
 // --- API: Belge yükle
-app.post('/api/documents', (req, res) => {
-  const uid = getUserId(req);
-  if (!uid) return res.status(401).json({ ok: false, message: 'Giriş yapmalısınız.' });
-  upload.single('file')(req, res, (err) => {
+app.post('/api/documents', async (req, res) => {
+  const sid = req.cookies?.session;
+  if (!sid) return res.status(401).json({ ok: false, message: 'Giriş yapmalısınız.' });
+  upload.single('file')(req, res, async (err) => {
     if (err) return res.status(400).json({ ok: false, message: 'Dosya yükleme hatası.' });
     const file = req.file;
     if (!file) return res.status(400).json({ ok: false, message: 'Dosya seçiniz.' });
@@ -93,46 +102,42 @@ app.post('/api/documents', (req, res) => {
     const allowed = { word: ['doc', 'docx'], excel: ['xls', 'xlsx'], pdf: ['pdf'] };
     const type = file_type || (allowed.pdf.includes(ext) ? 'pdf' : allowed.word.includes(ext) ? 'word' : allowed.excel.includes(ext) ? 'excel' : 'other');
     try {
-      const result = db.prepare(`
-        INSERT INTO documents (user_id, title, description, file_type, category, file_name, file_path, file_size)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(uid, title || file.originalname, description || '', type, category || 'diger', file.originalname, file.filename, file.size);
-      res.json({ ok: true, id: result.lastInsertRowid, message: 'Belge yüklendi.' });
+      const session = await getUserFromSession(sid);
+      if (!session) return res.status(401).json({ ok: false, message: 'Oturum bulunamadı.' });
+      const { data, error } = await supabase.from('documents').insert({
+        user_id: session.users.id,
+        title: title || file.originalname,
+        description: description || '',
+        file_type: type,
+        category: category || 'diger',
+        file_name: file.originalname,
+        file_path: file.filename,
+        file_size: file.size
+      }).select();
+      if (error) return res.status(500).json({ ok: false, message: error.message });
+      res.json({ ok: true, id: data[0].id, message: 'Belge yüklendi.' });
     } catch (e) {
       res.status(500).json({ ok: false, message: 'Kayıt hatası.' });
     }
   });
 });
 
-// --- API: Belge ara (tip + metin)
-app.get('/api/documents', (req, res) => {
+// --- API: Belge ara
+app.get('/api/documents', async (req, res) => {
   const { type, q, category } = req.query;
-  let sql = `
-    SELECT d.id, d.title, d.description, d.file_type, d.category, d.file_name, d.file_size, d.created_at, u.username
-    FROM documents d
-    JOIN users u ON d.user_id = u.id
-    WHERE 1=1
-  `;
-  const params = [];
-  if (type && type !== 'tumu') {
-    sql += ' AND d.file_type = ?';
-    params.push(type);
-  }
-  if (category && category !== 'tumu') {
-    sql += ' AND d.category = ?';
-    params.push(category);
-  }
+  let query = supabase.from('documents').select('id, title, description, file_type, category, file_name, file_size, created_at, username:users(username)');
+  if (type && type !== 'tumu') query = query.eq('file_type', type);
+  if (category && category !== 'tumu') query = query.eq('category', category);
   if (q && q.trim()) {
-    sql += ' AND (d.title LIKE ? OR d.description LIKE ?)';
-    const like = '%' + q.trim() + '%';
-    params.push(like, like);
+    query = query.or(`title.ilike.%${q.trim()}%,description.ilike.%${q.trim()}%`);
   }
-  sql += ' ORDER BY d.created_at DESC';
-  const rows = db.prepare(sql).all(...params);
-  res.json({ documents: rows });
+  const { data, error } = await query.order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ documents: [], error: error.message });
+  const docs = (data || []).map(d => ({ ...d, username: d.username?.username }));
+  res.json({ documents: docs });
 });
 
-// --- API: Supabase test endpoint
+// --- API: Supabase test
 app.get('/api/supabase-test', async (req, res) => {
   try {
     const { data, error } = await supabase.from('documents').select('id, title').limit(1);
@@ -143,15 +148,14 @@ app.get('/api/supabase-test', async (req, res) => {
   }
 });
 
-// --- API: İndir (dosya adı ile güvenli)
-app.get('/api/documents/:id/download', (req, res) => {
-  const row = db.prepare('SELECT file_path, file_name FROM documents WHERE id = ?').get(req.params.id);
-  if (!row) return res.status(404).send('Belge bulunamadı.');
-  const filePath = path.join(UPLOADS_DIR, row.file_path);
-  res.download(filePath, row.file_name);
+// --- API: İndir
+app.get('/api/documents/:id/download', async (req, res) => {
+  const { data, error } = await supabase.from('documents').select('file_path, file_name').eq('id', req.params.id).single();
+  if (error || !data) return res.status(404).send('Belge bulunamadı.');
+  const filePath = path.join(UPLOADS_DIR, data.file_path);
+  res.download(filePath, data.file_name);
 });
 
-// SPA: tüm sayfalar index'e yönlendirilsin (tek sayfa uygulaması için)
 app.get('/giris', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/kayit', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/yukle', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

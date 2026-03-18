@@ -1,0 +1,11 @@
+tasks:
+  - id: deploy_vercel
+    name: Deploy to Vercel
+    description: Deploy the latest main to production on Vercel
+    type: shell
+    command: "npx vercel --prod"
+  - id: check_supabase
+    name: Check Supabase connection
+    description: Validate Supabase connectivity by querying documents table
+    type: shell
+    command: "node -e \"const { createClient } = require('@supabase/supabase-js'); const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY); supabase.from('documents').select('*').limit(1).then(r => { console.log(r); process.exit(r.error ? 1 : 0); }).catch(e => { console.error(e); process.exit(1); });\""
