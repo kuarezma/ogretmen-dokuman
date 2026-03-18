@@ -351,19 +351,17 @@ const Home = () => {
                     <h3><Folder size={24} fill="currentColor" fillOpacity="0.2" style={{ color: 'var(--color-primary)', marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }}/> Arşiv Klasörleri</h3>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                     {Object.keys(GRADE_LESSONS).map((grade) => {
-                       if (grade === "Tüm Sınıflar") return null;
-                       return (
-                       <div 
-                         key={grade} 
-                         onClick={() => handleGradeClick(grade)}
-                         className="folder-card glass-panel hover-effect"
-                         style={{ padding: '1.5rem', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-lg)', minHeight: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
-                       >
-                         <Folder size={48} color="var(--color-primary)" fill="currentColor" fillOpacity="0.15" style={{ margin: '0 auto 1rem', opacity: 0.9 }} />
-                         <h4 style={{ margin: 0, color: 'var(--color-text)' }}>{grade}</h4>
-                       </div>
-                     })}
+                    {Object.keys(GRADE_LESSONS).filter(grade => grade !== "Tüm Sınıflar").map((grade) => (
+                      <div 
+                        key={grade} 
+                        onClick={() => handleGradeClick(grade)}
+                        className="folder-card glass-panel hover-effect"
+                        style={{ padding: '1.5rem', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-lg)', minHeight: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Folder size={48} color="var(--color-primary)" fill="currentColor" fillOpacity="0.15" style={{ margin: '0 auto 1rem', opacity: 0.9 }} />
+                        <h4 style={{ margin: 0, color: 'var(--color-text)' }}>{grade}</h4>
+                      </div>
+                    ))}
                   </div>
                </section>
             </>
