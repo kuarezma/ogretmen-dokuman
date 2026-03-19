@@ -50,7 +50,7 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
       setDownloadCount(prev => (prev || 0) + 1);
       
       window.open(document.file_url, '_blank');
-      toast.success('Dosya açılıyor! Yeni sekmede kontrol edin.');
+      toast.success('İndirme başladı!');
     } catch {
       window.open(document.file_url, '_blank');
     } finally {
