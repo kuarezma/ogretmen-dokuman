@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, UploadCloud, FileText, CheckCircle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { toast } from 'react-hot-toast';
 import './AuthModal.css'; 
 
 // Sabit Kategori Verileri (Sınıf -> Ders Hiyerarşisi)
@@ -49,28 +50,39 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
     setIsUploading(true);
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) return;
+    if (!currentUser) {
+      toast.error('Yüklemek için giriş yapmalısınız.');
+      setIsUploading(false);
+      return;
+    }
 
     try {
       let fileUrl = '';
       if (file) {
-         const fileExt = file.name.split('.').pop();
-         const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-         
-         const { error: uploadError } = await supabase.storage
-           .from('documents')
-           .upload(fileName, file);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        
+        toast.loading('Dosya yükleniyor...', { id: 'upload' });
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(fileName, file);
 
-         if (uploadError) throw uploadError;
+        if (uploadError) {
+          toast.error('Dosya yüklenemedi: ' + uploadError.message, { id: 'upload' });
+          throw uploadError;
+        }
 
-         const { data: publicUrlData } = supabase.storage
-           .from('documents')
-           .getPublicUrl(fileName);
-           
-         fileUrl = publicUrlData.publicUrl;
+        const { data: publicUrlData } = supabase.storage
+          .from('documents')
+          .getPublicUrl(fileName);
+          
+        fileUrl = publicUrlData.publicUrl;
+        toast.success('Dosya yüklendi!', { id: 'upload' });
       }
 
-      // Supabase veritabanına ekle
+      toast.loading('Belge kaydediliyor...', { id: 'saving' });
+      
       const { data, error } = await supabase
         .from('documents')
         .insert([{
@@ -86,7 +98,12 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
         }])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        toast.error('Belge kaydedilemedi: ' + error.message, { id: 'saving' });
+        throw error;
+      }
+
+      toast.success('Belge başarıyla eklendi!', { id: 'saving' });
 
       setIsUploading(false);
       setSuccess(true);
@@ -101,8 +118,8 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
 
     } catch (err) {
       console.error("Yükleme hatası:", err);
-      const msg = err?.message || err?.error_description || JSON.stringify(err);
-      alert("Belge yüklenirken hata oluştu:\n" + msg);
+      toast.error('Hata: ' + (err?.message || 'Bilinmeyen hata'), { id: 'upload' });
+      toast.error('Hata: ' + (err?.message || 'Bilinmeyen hata'), { id: 'saving' });
     } finally {
       setIsUploading(false);
     }
