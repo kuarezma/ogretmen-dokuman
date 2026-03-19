@@ -270,13 +270,15 @@ const DocumentCard = ({ document }) => {
       
       setDownloadCount(prev => (prev || 0) + 1);
       
-      const link = document.createElement('a');
-      link.href = document.file_url;
-      link.target = '_blank';
-      link.rel = 'noopener,noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const opened = window.open(document.file_url, '_blank');
+      if (!opened) {
+        const link = document.createElement('a');
+        link.href = document.file_url;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
       
       toast.success('İndirme başladı!');
     } catch (err) {
