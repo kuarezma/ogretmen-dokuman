@@ -49,18 +49,10 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
       
       setDownloadCount(prev => (prev || 0) + 1);
       
-      const a = document.createElement('a');
-      a.href = document.file_url;
-      a.download = document.title || 'belge';
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      toast.success('İndirme başladı!');
-    } catch {
       window.open(document.file_url, '_blank');
       toast.success('Yeni sekmede açıldı!');
+    } catch {
+      window.open(document.file_url, '_blank');
     } finally {
       setIsDownloading(false);
     }

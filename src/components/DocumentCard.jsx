@@ -270,19 +270,11 @@ const DocumentCard = ({ document }) => {
       
       setDownloadCount(prev => (prev || 0) + 1);
       
-      const a = document.createElement('a');
-      a.href = document.file_url;
-      a.download = document.title || 'belge';
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      toast.success('İndirme başladı!');
+      window.open(document.file_url, '_blank');
+      toast.success('Yeni sekmede açıldı!');
     } catch (err) {
       console.error('İndirme hatası:', err);
       window.open(document.file_url, '_blank');
-      toast.success('Yeni sekmede açıldı!');
     } finally {
       setIsDownloading(false);
     }
