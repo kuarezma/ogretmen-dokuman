@@ -345,25 +345,99 @@ const Home = () => {
                 </section>
               )}
 
-              {/* SINIF KLASÖRLERİ */}
+              {/* OKUL ÖNCESİ */}
               <section className="category-section">
-                  <div className="section-header">
-                    <h3><Folder size={24} fill="currentColor" fillOpacity="0.2" style={{ color: 'var(--color-primary)', marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }}/> Arşiv Klasörleri</h3>
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#ec4899', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ width: '4px', height: '20px', backgroundColor: '#ec4899', borderRadius: '2px' }}></span>
+                  Okul Öncesi
+                </h4>
+                <div className="folder-grid">
+                  <div 
+                    onClick={() => handleGradeClick("Okul Öncesi")}
+                    className="folder-card glass-panel hover-effect folder-preschool"
+                  >
+                    <Folder size={40} color="#ec4899" fill="currentColor" fillOpacity="0.15" />
+                    <h4>Okul Öncesi</h4>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                    {Object.keys(GRADE_LESSONS).filter(grade => grade !== "Tüm Sınıflar").map((grade) => (
-                      <div 
-                        key={grade} 
-                        onClick={() => handleGradeClick(grade)}
-                        className="folder-card glass-panel hover-effect"
-                        style={{ padding: '1.5rem', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-lg)', minHeight: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
-                      >
-                        <Folder size={48} color="var(--color-primary)" fill="currentColor" fillOpacity="0.15" style={{ margin: '0 auto 1rem', opacity: 0.9 }} />
-                        <h4 style={{ margin: 0, color: 'var(--color-text)' }}>{grade}</h4>
-                      </div>
-                    ))}
+                </div>
+              </section>
+
+              {/* İLKOKUL (1-4) */}
+              <section className="category-section">
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ width: '4px', height: '20px', backgroundColor: '#10b981', borderRadius: '2px' }}></span>
+                  İlkokul (1-4. Sınıflar)
+                </h4>
+                <div className="folder-grid">
+                  {["1. Sınıf", "2. Sınıf", "3. Sınıf", "4. Sınıf"].map((grade) => (
+                    <div 
+                      key={grade} 
+                      onClick={() => handleGradeClick(grade)}
+                      className="folder-card glass-panel hover-effect folder-primary"
+                    >
+                      <Folder size={40} color="#10b981" fill="currentColor" fillOpacity="0.15" />
+                      <h4>{grade}</h4>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* ORTAOKUL (5-8) */}
+              <section className="category-section">
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ width: '4px', height: '20px', backgroundColor: '#3b82f6', borderRadius: '2px' }}></span>
+                  Ortaokul (5-8. Sınıflar)
+                </h4>
+                <div className="folder-grid">
+                  {["5. Sınıf", "6. Sınıf", "7. Sınıf", "8. Sınıf"].map((grade) => (
+                    <div 
+                      key={grade} 
+                      onClick={() => handleGradeClick(grade)}
+                      className="folder-card glass-panel hover-effect folder-middle"
+                    >
+                      <Folder size={40} color="#3b82f6" fill="currentColor" fillOpacity="0.15" />
+                      <h4>{grade}</h4>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* LİSE (9-12) */}
+              <section className="category-section">
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ width: '4px', height: '20px', backgroundColor: '#8b5cf6', borderRadius: '2px' }}></span>
+                  Lise (9-12. Sınıflar)
+                </h4>
+                <div className="folder-grid">
+                  {["9. Sınıf", "10. Sınıf", "11. Sınıf", "12. Sınıf"].map((grade) => (
+                    <div 
+                      key={grade} 
+                      onClick={() => handleGradeClick(grade)}
+                      className="folder-card glass-panel hover-effect folder-high"
+                    >
+                      <Folder size={40} color="#8b5cf6" fill="currentColor" fillOpacity="0.15" />
+                      <h4>{grade}</h4>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* GENEL */}
+              <section className="category-section">
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ width: '4px', height: '20px', backgroundColor: '#f59e0b', borderRadius: '2px' }}></span>
+                  Genel / Ortak
+                </h4>
+                <div className="folder-grid">
+                  <div 
+                    onClick={() => handleGradeClick("Genel / Ortak")}
+                    className="folder-card glass-panel hover-effect folder-general"
+                  >
+                    <Folder size={40} color="#f59e0b" fill="currentColor" fillOpacity="0.15" />
+                    <h4>Genel / Ortak</h4>
                   </div>
-               </section>
+                </div>
+              </section>
             </>
           )}
 
