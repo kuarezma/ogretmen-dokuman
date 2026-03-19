@@ -271,7 +271,7 @@ const DocumentCard = ({ document }) => {
       setDownloadCount(prev => (prev || 0) + 1);
       
       window.open(document.file_url, '_blank');
-      toast.success('Yeni sekmede açıldı!');
+      toast.success('Dosya açılıyor! Yeni sekmede kontrol edin.');
     } catch (err) {
       console.error('İndirme hatası:', err);
       window.open(document.file_url, '_blank');
