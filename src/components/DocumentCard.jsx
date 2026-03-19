@@ -263,40 +263,26 @@ const DocumentCard = ({ document }) => {
     
     setIsDownloading(true);
     try {
-      const { error } = await supabase
+      await supabase
         .from('documents')
         .update({ download_count: (downloadCount || 0) + 1 })
         .eq('id', document.id);
       
-      if (!error) {
-        setDownloadCount(prev => (prev || 0) + 1);
-      }
+      setDownloadCount(prev => (prev || 0) + 1);
       
-      const response = await fetch(document.file_url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = document.title || 'document';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
+      const a = document.createElement('a');
+      a.href = document.file_url;
+      a.download = document.title || 'belge';
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       
       toast.success('İndirme başladı!');
     } catch (err) {
       console.error('İndirme hatası:', err);
-      const link = document.createElement('a');
-      link.href = document.file_url;
-      link.target = '_blank';
-      link.download = document.title || 'document';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success('İndirme başladı!');
+      window.open(document.file_url, '_blank');
+      toast.success('Yeni sekmede açıldı!');
     } finally {
       setIsDownloading(false);
     }
