@@ -272,19 +272,30 @@ const DocumentCard = ({ document }) => {
         setDownloadCount(prev => (prev || 0) + 1);
       }
       
+      const response = await fetch(document.file_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = document.file_url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      link.href = url;
       link.download = document.title || 'document';
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
       
       toast.success('İndirme başladı!');
     } catch (err) {
       console.error('İndirme hatası:', err);
-      window.open(document.file_url, '_blank');
+      const link = document.createElement('a');
+      link.href = document.file_url;
+      link.target = '_blank';
+      link.download = document.title || 'document';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       toast.success('İndirme başladı!');
     } finally {
       setIsDownloading(false);
