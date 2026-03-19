@@ -272,11 +272,20 @@ const DocumentCard = ({ document }) => {
         setDownloadCount(prev => (prev || 0) + 1);
       }
       
-      window.open(document.file_url, '_blank');
-      toast.success('Belge indirilmeye başlandı!');
+      const link = document.createElement('a');
+      link.href = document.file_url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.download = document.title || 'document';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('İndirme başladı!');
     } catch (err) {
       console.error('İndirme hatası:', err);
       window.open(document.file_url, '_blank');
+      toast.success('İndirme başladı!');
     } finally {
       setIsDownloading(false);
     }
