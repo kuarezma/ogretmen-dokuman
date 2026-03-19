@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import SearchBar from '../components/SearchBar';
 import DocumentCard from '../components/DocumentCard';
-import { Sparkles, Folder, ChevronRight, Home as HomeIcon } from 'lucide-react';
+import { Sparkles, Folder, ChevronRight, ChevronLeft, Home as HomeIcon } from 'lucide-react';
 import './Home.css';
 
 const Home = () => {
@@ -184,11 +184,44 @@ const Home = () => {
     setCurrentPath({ grade: null, lesson: null, category: null });
   };
 
+  // Geri butonu
+  const handleGoBack = () => {
+    if (folderLevel === 3) {
+      setFolderLevel(2);
+      setCurrentPath(prev => ({ ...prev, category: null }));
+    } else if (folderLevel === 2) {
+      setFolderLevel(1);
+      setCurrentPath(prev => ({ ...prev, lesson: null }));
+    } else if (folderLevel === 1) {
+      setFolderLevel(0);
+      setCurrentPath({ grade: null, lesson: null, category: null });
+    }
+  };
+
   // Level Render Metodları
   const renderBreadcrumb = () => (
-    <div className="breadcrumb glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', marginBottom: '1.5rem', borderRadius: 'var(--radius-lg)' }}>
+    <div className="breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+      <button 
+        onClick={handleGoBack}
+        style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '0.5rem',
+          padding: '0.5rem 1rem',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-lg)',
+          color: 'var(--color-text)',
+          cursor: 'pointer',
+          fontWeight: '500',
+          fontSize: '0.9rem'
+        }}
+      >
+        <ChevronLeft size={18} /> Geri
+      </button>
+      
       <button onClick={resetToHome} style={{ display: 'flex', alignItems: 'center', background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontWeight: '500' }}>
-        <HomeIcon size={18} style={{ marginRight: '0.25rem' }} /> Ana Sayfa
+        <HomeIcon size={16} style={{ marginRight: '0.25rem' }} /> Ana Sayfa
       </button>
       
       {currentPath.grade && (
@@ -211,8 +244,8 @@ const Home = () => {
 
       {currentPath.category && (
         <>
-           <ChevronRight size={16} color="var(--color-text-muted)" />
-           <span style={{ color: 'var(--color-text)', fontWeight: '600' }}>{currentPath.category}</span>
+          <ChevronRight size={16} color="var(--color-text-muted)" />
+          <span style={{ color: 'var(--color-text)', fontWeight: '600' }}>{currentPath.category}</span>
         </>
       )}
     </div>
