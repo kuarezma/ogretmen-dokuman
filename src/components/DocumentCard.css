@@ -1,10 +1,10 @@
 .doc-card {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.25rem;
   transition: transform var(--transition-bounce), box-shadow var(--transition-normal);
   height: 100%;
-  min-height: 320px;
+  min-height: 280px;
 }
 
 .doc-card:hover {
@@ -17,7 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   flex-shrink: 0;
   gap: 0.5rem;
 }
@@ -28,15 +28,15 @@
 
 .doc-meta-top {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .format-badge, .category-badge {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 0.25rem 0.6rem;
+  padding: 0.2rem 0.5rem;
   border-radius: var(--radius-full);
   white-space: nowrap;
 }
@@ -53,39 +53,38 @@
 }
 
 .doc-title {
-  font-size: 1.1rem;
-  min-height: 2.8em;
-  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  min-height: 2.2em;
+  margin-bottom: 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.4;
+  line-height: 1.35;
   font-weight: 600;
-  letter-spacing: -0.01em;
 }
 
 .doc-desc {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
-  min-height: 4em;
+  min-height: 3.2em;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   flex-grow: 1;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .doc-card-footer {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: auto;
-  padding-top: 1rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--glass-border);
   flex-shrink: 0;
 }
@@ -93,15 +92,15 @@
 .doc-info {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
+  gap: 0.3rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   white-space: nowrap;
 }
@@ -117,33 +116,33 @@
 .doc-card-interactions {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
 }
 
 .doc-card-buttons {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
 }
 
 .btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
 }
 
 .interaction-btn {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.2rem;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--color-text-muted);
   transition: all 0.2s ease;
-  padding: 0.4rem 0.6rem;
+  padding: 0.3rem 0.5rem;
   border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
@@ -165,7 +164,7 @@
 }
 
 .share-btn {
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.6rem;
 }
 
 .dl-btn {
@@ -175,26 +174,27 @@
 @media (max-width: 480px) {
   .doc-card {
     padding: 1rem;
-    min-height: 280px;
+    min-height: 260px;
   }
   
   .doc-title {
-    font-size: 1rem;
-    min-height: 2.5em;
+    font-size: 0.95rem;
+    min-height: 2.1em;
   }
   
   .doc-card-footer {
-    gap: 0.75rem;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
   }
   
   .doc-info {
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
   
   .doc-card-actions {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
   
   .doc-card-buttons {

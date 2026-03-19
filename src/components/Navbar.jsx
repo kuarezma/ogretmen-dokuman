@@ -111,6 +111,9 @@ const Navbar = () => {
 
             {user ? (
               <>
+                <span className="welcome-text">
+                  Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
+                </span>
                 <Link
                   to="/profile"
                   className="btn btn-ghost nav-btn"
