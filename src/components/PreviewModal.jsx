@@ -49,10 +49,22 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
       
       setDownloadCount(prev => (prev || 0) + 1);
       
-      window.open(document.file_url, '_blank');
+      const link = document.createElement('a');
+      link.href = document.file_url;
+      link.target = '_blank';
+      link.rel = 'noopener,noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
       toast.success('İndirme başladı!');
     } catch {
-      window.open(document.file_url, '_blank');
+      const link = document.createElement('a');
+      link.href = document.file_url;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } finally {
       setIsDownloading(false);
     }
