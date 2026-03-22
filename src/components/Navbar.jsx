@@ -84,7 +84,7 @@ const Navbar = () => {
           {/* Mobile Menu Toggle & Profile */}
           <div className="mobile-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             {user ? (
-              <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
+              <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ alignItems: 'center', color: 'var(--color-primary)' }}>
                 {user.avatar_url ? (
                   <img src={user.avatar_url} alt="Profil" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-primary-light)' }} />
                 ) : (
