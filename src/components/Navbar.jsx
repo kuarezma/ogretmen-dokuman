@@ -73,7 +73,7 @@ const Navbar = () => {
   return (
     <>
       <header className="navbar glass-panel">
-        <div className="container nav-container">
+        <div className="nav-container">
           <Link to="/" className="brand">
             <div className="brand-icon">
               <BookOpen size={24} color="var(--color-primary)" />
@@ -141,44 +141,40 @@ const Navbar = () => {
                 </span>
                 <Link
                   to="/profile"
-                  className="nav-badge-btn nav-badge-profile"
+                  className="btn btn-ghost nav-btn mobile-badge-profile"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <User size={16} />
+                  <User size={18} />
                   <span className="mobile-nav-text">Profil</span>
                 </Link>
                 <button 
-                  className="nav-badge-btn nav-badge-upload"
+                  className="btn btn-outline nav-btn mobile-badge-upload"
                   onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
-                  style={{ border: 'none', background: 'rgba(20, 184, 166, 0.1)', cursor: 'pointer' }}
                 >
-                  <Upload size={16} /> <span className="nav-btn-text">Yükle</span>
+                  <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
                   <span className="mobile-nav-text">Belge Yükle</span>
                 </button>
                 <button 
-                  className="nav-badge-btn nav-badge-logout" 
+                  className="btn btn-ghost nav-btn mobile-badge-logout" 
                   onClick={handleLogout}
-                  style={{ border: 'none', background: 'rgba(244, 63, 94, 0.1)', cursor: 'pointer' }}
                 >
-                  <LogOut size={16} />
+                  <LogOut size={18} />
                   <span className="mobile-nav-text">Çıkış Yap</span>
                 </button>
               </>
             ) : (
               <>
                 <button 
-                  className="nav-badge-btn nav-badge-login" 
+                  className="btn btn-ghost nav-btn mobile-badge-login" 
                   onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
-                  style={{ border: 'none', background: 'rgba(168, 85, 247, 0.1)', cursor: 'pointer' }}
                 >
-                  <User size={16} /> Giriş Yap
+                  <User size={18} /> Giriş Yap
                 </button>
                 <button 
-                  className="nav-badge-btn nav-badge-register" 
+                  className="btn btn-primary nav-btn mobile-badge-register" 
                   onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
-                  style={{ border: 'none', background: 'rgba(59, 130, 246, 0.1)', cursor: 'pointer' }}
                 >
-                  <Users size={16} /> Kayıt Ol
+                  <Users size={18} /> Kayıt Ol
                 </button>
               </>
             )}

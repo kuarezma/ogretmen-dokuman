@@ -13,6 +13,8 @@
   justify-content: space-between;
   height: 80px;
   gap: 1rem;
+  padding: 0 1.5rem;
+  max-width: 100%;
 }
 
 .brand {
@@ -127,6 +129,22 @@
     padding: 0.6rem 0.8rem;
   }
   
+  .nav-actions .mobile-badge-profile {
+    background-color: rgba(99, 102, 241, 0.1); color: #6366f1; border: none; border-radius: var(--radius-full);
+  }
+  .nav-actions .mobile-badge-upload {
+    background-color: rgba(20, 184, 166, 0.1); color: #14b8a6; border: none; border-radius: var(--radius-full);
+  }
+  .nav-actions .mobile-badge-logout {
+    background-color: rgba(244, 63, 94, 0.1); color: #f43f5e; border: none; border-radius: var(--radius-full);
+  }
+  .nav-actions .mobile-badge-login {
+    background-color: rgba(168, 85, 247, 0.1); color: #a855f7; border: none; border-radius: var(--radius-full);
+  }
+  .nav-actions .mobile-badge-register {
+    background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: none; border-radius: var(--radius-full);
+  }
+  
   .nav-badge-btn {
     width: 100%;
     justify-content: flex-start;
@@ -209,13 +227,14 @@
 .nav-badge-btn {
   padding: 0.35rem 0.6rem;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   transition: all var(--transition-fast);
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.3rem;
+  white-space: nowrap;
 }
 
 [data-theme="dark"] .nav-badge-btn {
