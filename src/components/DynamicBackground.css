@@ -12,51 +12,6 @@
   pointer-events: none;
 }
 
-/* Base shape styling for soft floating orbs */
-.bg-shape {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.25;
-  animation: floatOrb 20s infinite ease-in-out alternate;
-  will-change: transform;
-}
-
-[data-theme="dark"] .bg-shape {
-  opacity: 0.15;
-}
-
-/* Primary color orb */
-.bg-shape-1 {
-  width: 60vw;
-  height: 60vw;
-  background-color: var(--color-primary);
-  top: -20%;
-  left: -20%;
-  animation-duration: 25s;
-}
-
-/* Secondary color orb */
-.bg-shape-2 {
-  width: 50vw;
-  height: 50vw;
-  background-color: var(--color-secondary);
-  bottom: -20%;
-  right: -10%;
-  animation-duration: 28s;
-  animation-delay: -5s;
-}
-
-/* Success/Accent color orb representing growth/education */
-.bg-shape-3 {
-  width: 40vw;
-  height: 40vw;
-  background-color: var(--color-success);
-  top: 40%;
-  left: 30%;
-  animation-duration: 32s;
-  animation-delay: -12s;
-}
 
 /* Subtly animated notebook/grid pattern */
 .bg-grid {
@@ -103,12 +58,6 @@
 .dot-5 { width: 14px; height: 14px; left: 50%; animation-delay: 10s; }
 
 
-@keyframes floatOrb {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(5%, 5%) scale(1.1); }
-  66% { transform: translate(-3%, 8%) scale(0.9); }
-  100% { transform: translate(-5%, -5%) scale(1); }
-}
 
 @keyframes pulseGrid {
   0% { opacity: 0.3; transform: scale(1); }
