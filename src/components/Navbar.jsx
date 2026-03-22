@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot } from 'lucide-react';
+import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot, Users } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
 import { supabase } from '../supabaseClient';
@@ -81,14 +81,29 @@ const Navbar = () => {
             <h1>Öğretmen<span> Döküman</span></h1>
           </Link>
 
-          {/* Mobile Menu Toggle */}
-          <button 
-            className="mobile-menu-btn"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            title="Menü"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Menu Toggle & Profile */}
+          <div className="mobile-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {user ? (
+              <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} alt="Profil" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-primary-light)' }} />
+                ) : (
+                  <User size={24} />
+                )}
+              </Link>
+            ) : (
+              <button className="btn btn-ghost mobile-login-btn-direct" onClick={() => handleLoginClick()} style={{ padding: '0.4rem 0.6rem', fontSize: '0.9rem', color: 'var(--color-primary)' }}>
+                Giriş
+              </button>
+            )}
+            <button 
+              className="mobile-menu-btn"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              title="Menü"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
 
           <nav className={`nav-actions ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
             {/* Center Navigation Links */}
@@ -98,6 +113,9 @@ const Navbar = () => {
               </Link>
               <Link to="/requests" className={`nav-link ${location.pathname === '/requests' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
                 <HandHelping size={16}/> Talep Tahtası
+              </Link>
+              <Link to="/forum" className={`nav-link ${location.pathname === '/forum' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
+                <Users size={16}/> Öğretmenler Odası
               </Link>
               <Link to="/ai-generator" className={`nav-link ${location.pathname === '/ai-generator' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
                 <Bot size={16}/> Makine

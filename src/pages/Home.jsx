@@ -378,11 +378,6 @@ const Home = () => {
                     ))}
                   </div>
 
-                  {/* Leaderboard & Calendar Section rendered side by side */}
-                  <div style={{ marginBottom: '2.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                    <Leaderboard />
-                    <CalendarWidget />
-                  </div>
                 </section>
               )}
 
@@ -479,6 +474,12 @@ const Home = () => {
                   </div>
                 </div>
               </section>
+
+              {/* Leaderboard & Calendar Section rendered at the bottom */}
+              <div style={{ marginBottom: '2.5rem', marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                <Leaderboard />
+                <CalendarWidget />
+              </div>
             </>
           )}
 

@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Stats from './pages/Stats';
 import Requests from './pages/Requests';
+import Forum from './pages/Forum';
 import AiGenerator from './pages/AiGenerator';
 import AuthCallback from './pages/AuthCallback';
 import './App.css';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/requests" element={<Requests />} />
+          <Route path="/forum" element={<Forum />} />
           <Route path="/ai-generator" element={<AiGenerator />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/auth/confirm" element={<AuthCallback />} />
