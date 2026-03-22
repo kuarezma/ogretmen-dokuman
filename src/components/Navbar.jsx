@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot, Users } from 'lucide-react';
+import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot, Users, Home } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
 import { supabase } from '../supabaseClient';
@@ -108,8 +108,8 @@ const Navbar = () => {
           <nav className={`nav-actions ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
             {/* Center Navigation Links */}
             <div className="nav-center-links">
-              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                Ana Sayfa
+              <Link to="/" className={`nav-badge-btn nav-badge-home ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <Home size={16}/> Ana Sayfa
               </Link>
               <Link to="/requests" className={`nav-badge-btn nav-badge-requests ${location.pathname === '/requests' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
                 <HandHelping size={16}/> Talep Tahtası
@@ -141,32 +141,44 @@ const Navbar = () => {
                 </span>
                 <Link
                   to="/profile"
-                  className="btn btn-ghost nav-btn"
+                  className="nav-badge-btn nav-badge-profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  style={{ padding: '0.4rem 0.6rem' }}
                 >
-                  <User size={18} />
+                  <User size={16} />
                   <span className="mobile-nav-text">Profil</span>
                 </Link>
                 <button 
-                  className="btn btn-outline nav-btn"
+                  className="nav-badge-btn nav-badge-upload"
                   onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
+                  style={{ border: 'none', background: 'rgba(20, 184, 166, 0.1)', cursor: 'pointer' }}
                 >
-                  <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
+                  <Upload size={16} /> <span className="nav-btn-text">Yükle</span>
                   <span className="mobile-nav-text">Belge Yükle</span>
                 </button>
-                <button className="btn btn-ghost nav-btn" onClick={handleLogout}>
-                  <LogOut size={18} />
+                <button 
+                  className="nav-badge-btn nav-badge-logout" 
+                  onClick={handleLogout}
+                  style={{ border: 'none', background: 'rgba(244, 63, 94, 0.1)', cursor: 'pointer' }}
+                >
+                  <LogOut size={16} />
                   <span className="mobile-nav-text">Çıkış Yap</span>
                 </button>
               </>
             ) : (
               <>
-                <button className="btn btn-ghost nav-btn" onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}>
-                  Giriş Yap
+                <button 
+                  className="nav-badge-btn nav-badge-login" 
+                  onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
+                  style={{ border: 'none', background: 'rgba(168, 85, 247, 0.1)', cursor: 'pointer' }}
+                >
+                  <User size={16} /> Giriş Yap
                 </button>
-                <button className="btn btn-primary nav-btn" onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}>
-                  <User size={18} /> Kayıt Ol
+                <button 
+                  className="nav-badge-btn nav-badge-register" 
+                  onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
+                  style={{ border: 'none', background: 'rgba(59, 130, 246, 0.1)', cursor: 'pointer' }}
+                >
+                  <Users size={16} /> Kayıt Ol
                 </button>
               </>
             )}
