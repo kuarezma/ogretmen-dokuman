@@ -3,6 +3,8 @@ import { supabase } from '../supabaseClient';
 import SearchBar from '../components/SearchBar';
 import DocumentCard from '../components/DocumentCard';
 import { Sparkles, Folder, ChevronRight, ChevronLeft, Home as HomeIcon } from 'lucide-react';
+import Leaderboard from '../components/Leaderboard';
+import CalendarWidget from '../components/CalendarWidget';
 import './Home.css';
 
 const Home = () => {
@@ -368,12 +370,18 @@ const Home = () => {
                     </h3>
                   </div>
                   
-                  <div className="documents-grid">
+                  <div className="documents-grid" style={{ marginBottom: '2.5rem' }}>
                     {recentDocuments.map((doc) => (
                       <div key={`recent-${doc.id}`} className="doc-item">
                         <DocumentCard document={doc} />
                       </div>
                     ))}
+                  </div>
+
+                  {/* Leaderboard & Calendar Section rendered side by side */}
+                  <div style={{ marginBottom: '2.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                    <Leaderboard />
+                    <CalendarWidget />
                   </div>
                 </section>
               )}

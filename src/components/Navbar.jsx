@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UploadModal from './UploadModal';
 import { supabase } from '../supabaseClient';
@@ -14,6 +14,8 @@ const Navbar = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+  const location = useLocation(); // Initialize useLocation hook
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
@@ -89,6 +91,22 @@ const Navbar = () => {
           </button>
 
           <nav className={`nav-actions ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+            {/* Center Navigation Links */}
+            <div className="nav-center-links">
+              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
+                Ana Sayfa
+              </Link>
+              <Link to="/requests" className={`nav-link ${location.pathname === '/requests' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
+                <HandHelping size={16}/> Talep Tahtası
+              </Link>
+              <Link to="/ai-generator" className={`nav-link ${location.pathname === '/ai-generator' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
+                <Bot size={16}/> Makine
+              </Link>
+              <Link to="/stats" className={`nav-link ${location.pathname === '/stats' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
+                İstatistikler
+              </Link>
+            </div>
+
             <button
               className="btn btn-ghost nav-btn dark-toggle"
               onClick={toggleDarkMode}
@@ -97,17 +115,6 @@ const Navbar = () => {
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-
-            <Link
-              to="/stats"
-              className="btn btn-ghost nav-btn"
-              title="İstatistikler"
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ padding: '0.4rem 0.6rem' }}
-            >
-              <BarChart2 size={18} />
-              <span className="mobile-nav-text">İstatistikler</span>
-            </Link>
 
             {user ? (
               <>

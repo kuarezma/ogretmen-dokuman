@@ -9,9 +9,16 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [userStats, setUserStats] = useState({ totalDownloads: 0, totalLikes: 0, totalComments: 0 });
+  const [userStats, setUserStats] = useState({ totalDownloads: 0, totalLikes: 0, totalComments: 0, score: 0 });
   
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+  const getBadgeName = (score) => {
+    if (score >= 500) return "Zümre Başkanı";
+    if (score >= 100) return "Uzman Eğitmen";
+    if (score >= 20) return "Aktif Üye";
+    return "Yeni Başlayan";
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -48,7 +55,8 @@ const Profile = () => {
       setUserStats({
         totalDownloads,
         totalLikes,
-        totalComments: commentCount || 0
+        totalComments: commentCount || 0,
+        score: totalDownloads + (totalLikes * 5)
       });
     } catch (err) {
       console.error("Kullanıcı istatistikleri çekilemedi:", err);
@@ -251,6 +259,14 @@ const Profile = () => {
         <div className="profile-info">
           <h1>{currentUser.username}</h1>
           <p>{currentUser.email}</p>
+          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <span style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--color-warning)', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <Star size={14} /> {getBadgeName(userStats.score)}
+            </span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: '500' }}>
+              {userStats.score} Puan
+            </span>
+          </div>
         </div>
         <div className="profile-stats">
           <div className="stat-card">

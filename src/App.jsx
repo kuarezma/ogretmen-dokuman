@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Stats from './pages/Stats';
+import Requests from './pages/Requests';
+import AiGenerator from './pages/AiGenerator';
 import AuthCallback from './pages/AuthCallback';
 import './App.css';
 import DynamicBackground from './components/DynamicBackground';
@@ -41,6 +43,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/stats" element={<Stats />} />
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/ai-generator" element={<AiGenerator />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/auth/confirm" element={<AuthCallback />} />
         </Routes>
