@@ -5,6 +5,7 @@ import DocumentCard from '../components/DocumentCard';
 import { Sparkles, Folder, ChevronRight, ChevronLeft, Home as HomeIcon } from 'lucide-react';
 import Leaderboard from '../components/Leaderboard';
 import CalendarWidget from '../components/CalendarWidget';
+import LatestForumPosts from '../components/LatestForumPosts';
 import './Home.css';
 
 const Home = () => {
@@ -475,8 +476,13 @@ const Home = () => {
                 </div>
               </section>
 
+              {/* Forum Widget */}
+              <div style={{ marginBottom: '1.5rem', marginTop: '1.5rem' }}>
+                <LatestForumPosts />
+              </div>
+
               {/* Leaderboard & Calendar Section rendered at the bottom */}
-              <div style={{ marginBottom: '2.5rem', marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ marginBottom: '2.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
                 <Leaderboard />
                 <CalendarWidget />
               </div>

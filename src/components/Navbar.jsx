@@ -111,17 +111,17 @@ const Navbar = () => {
               <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
                 Ana Sayfa
               </Link>
-              <Link to="/requests" className={`nav-link ${location.pathname === '/requests' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/requests" className={`nav-badge-btn nav-badge-requests ${location.pathname === '/requests' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
                 <HandHelping size={16}/> Talep Tahtası
               </Link>
-              <Link to="/forum" className={`nav-link ${location.pathname === '/forum' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/forum" className={`nav-badge-btn nav-badge-forum ${location.pathname === '/forum' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
                 <Users size={16}/> Öğretmenler Odası
               </Link>
-              <Link to="/ai-generator" className={`nav-link ${location.pathname === '/ai-generator' ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setIsMobileMenuOpen(false)}>
-                <Bot size={16}/> Makine
+              <Link to="/ai-generator" className={`nav-badge-btn nav-badge-ai ${location.pathname === '/ai-generator' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <Bot size={16}/> Yapay Zeka
               </Link>
-              <Link to="/stats" className={`nav-link ${location.pathname === '/stats' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                İstatistikler
+              <Link to="/stats" className={`nav-badge-btn nav-badge-stats ${location.pathname === '/stats' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <BarChart2 size={16}/> İstatistikler
               </Link>
             </div>
 
