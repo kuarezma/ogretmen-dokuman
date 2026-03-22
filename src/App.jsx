@@ -6,10 +6,12 @@ import Profile from './pages/Profile';
 import Stats from './pages/Stats';
 import AuthCallback from './pages/AuthCallback';
 import './App.css';
+import DynamicBackground from './components/DynamicBackground';
 
 function App() {
   return (
     <Router>
+      <DynamicBackground />
       <Toaster 
         position="top-right"
         toastOptions={{

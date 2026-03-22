@@ -1,0 +1,140 @@
+/* src/components/DynamicBackground.css */
+.dynamic-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -10;
+  overflow: hidden;
+  background-color: var(--color-background);
+  transition: background-color 0.3s ease;
+  pointer-events: none;
+}
+
+/* Base shape styling for soft floating orbs */
+.bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.25;
+  animation: floatOrb 20s infinite ease-in-out alternate;
+  will-change: transform;
+}
+
+[data-theme="dark"] .bg-shape {
+  opacity: 0.15;
+}
+
+/* Primary color orb */
+.bg-shape-1 {
+  width: 60vw;
+  height: 60vw;
+  background-color: var(--color-primary);
+  top: -20%;
+  left: -20%;
+  animation-duration: 25s;
+}
+
+/* Secondary color orb */
+.bg-shape-2 {
+  width: 50vw;
+  height: 50vw;
+  background-color: var(--color-secondary);
+  bottom: -20%;
+  right: -10%;
+  animation-duration: 28s;
+  animation-delay: -5s;
+}
+
+/* Success/Accent color orb representing growth/education */
+.bg-shape-3 {
+  width: 40vw;
+  height: 40vw;
+  background-color: var(--color-success);
+  top: 40%;
+  left: 30%;
+  animation-duration: 32s;
+  animation-delay: -12s;
+}
+
+/* Subtly animated notebook/grid pattern */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  animation: pulseGrid 15s infinite alternate ease-in-out;
+}
+
+[data-theme="dark"] .bg-grid {
+  opacity: 0.2;
+  animation-name: pulseGridDark;
+}
+
+/* Floating educational tiny elements (dots, mimicking chalk dust or ideas) */
+.floating-elements {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.dot {
+  position: absolute;
+  background: var(--color-primary);
+  border-radius: 50%;
+  opacity: 0;
+  animation: floatUp 15s linear infinite;
+}
+
+[data-theme="dark"] .dot {
+  background: var(--color-text-main);
+}
+
+.dot-1 { width: 8px; height: 8px; left: 10%; animation-delay: 0s; }
+.dot-2 { width: 12px; height: 12px; left: 30%; animation-delay: 4s; }
+.dot-3 { width: 6px; height: 6px; left: 60%; animation-delay: 2s; }
+.dot-4 { width: 10px; height: 10px; left: 80%; animation-delay: 7s; }
+.dot-5 { width: 14px; height: 14px; left: 50%; animation-delay: 10s; }
+
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5%, 5%) scale(1.1); }
+  66% { transform: translate(-3%, 8%) scale(0.9); }
+  100% { transform: translate(-5%, -5%) scale(1); }
+}
+
+@keyframes pulseGrid {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.6; transform: scale(1.02); }
+}
+
+@keyframes pulseGridDark {
+  0% { opacity: 0.15; transform: scale(1); }
+  100% { opacity: 0.25; transform: scale(1.02); }
+}
+
+@keyframes floatUp {
+  0% {
+    bottom: -5vh;
+    opacity: 0;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 0.3;
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    bottom: 105vh;
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
