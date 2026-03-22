@@ -133,7 +133,9 @@
     background-color: rgba(99, 102, 241, 0.1); color: #6366f1; border: none; border-radius: var(--radius-full);
   }
   .nav-actions .mobile-badge-upload {
-    background-color: rgba(20, 184, 166, 0.1); color: #14b8a6; border: none; border-radius: var(--radius-full);
+    background-color: rgba(20, 184, 166, 0.1) !important; color: #14b8a6; border: none !important; border-radius: var(--radius-full) !important;
+    justify-content: center !important;
+    margin-top: 1rem !important;
   }
   .nav-actions .mobile-badge-logout {
     background-color: rgba(244, 63, 94, 0.1); color: #f43f5e; border: none; border-radius: var(--radius-full);
@@ -154,17 +156,7 @@
     display: none;
   }
 
-  .nav-actions .mobile-action-btn {
-    font-size: 1.05rem;
-    padding: 0.8rem 1rem;
-    gap: 0.6rem;
-  }
 
-  .nav-actions .mobile-action-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-  
   .mobile-only-dark-toggle {
     display: flex;
     align-items: center;

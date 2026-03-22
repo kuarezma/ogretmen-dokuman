@@ -149,37 +149,37 @@ const Navbar = () => {
                 </span>
                 <Link
                   to="/profile"
-                  className="btn btn-ghost nav-btn mobile-badge-profile mobile-action-btn"
+                  className="btn btn-ghost nav-btn mobile-badge-profile"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <User size={18} />
                   <span className="mobile-nav-text">Profil</span>
                 </Link>
                 <button 
-                  className="btn btn-outline nav-btn mobile-badge-upload mobile-action-btn"
-                  onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
-                >
-                  <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
-                  <span className="mobile-nav-text">Belge Yükle</span>
-                </button>
-                <button 
-                  className="btn btn-ghost nav-btn mobile-badge-logout mobile-action-btn" 
+                  className="btn btn-ghost nav-btn mobile-badge-logout" 
                   onClick={handleLogout}
                 >
                   <LogOut size={18} />
                   <span className="mobile-nav-text">Çıkış Yap</span>
                 </button>
+                <button 
+                  className="btn btn-outline nav-btn mobile-badge-upload"
+                  onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
+                >
+                  <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
+                  <span className="mobile-nav-text">Belge Yükle</span>
+                </button>
               </>
             ) : (
               <>
                 <button 
-                  className="btn btn-ghost nav-btn mobile-badge-login mobile-action-btn" 
+                  className="btn btn-ghost nav-btn mobile-badge-login" 
                   onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
                 >
                   <User size={18} /> Giriş Yap
                 </button>
                 <button 
-                  className="btn btn-primary nav-btn mobile-badge-register mobile-action-btn" 
+                  className="btn btn-primary nav-btn mobile-badge-register" 
                   onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
                 >
                   <Users size={18} /> Kayıt Ol

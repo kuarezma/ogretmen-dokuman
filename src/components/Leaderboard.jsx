@@ -67,10 +67,7 @@ const Leaderboard = () => {
   };
 
   const getBadgeName = (score) => {
-    if (score >= 500) return "Zümre Başkanı";
-    if (score >= 100) return "Uzman Eğitmen";
-    if (score >= 20) return "Aktif Üye";
-    return "Yeni Başlayan";
+    return "Öğretmen";
   };
 
   const getRankIcon = (index) => {
