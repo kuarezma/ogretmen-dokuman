@@ -150,6 +150,27 @@
     justify-content: flex-start;
   }
 
+  .nav-actions .dark-toggle {
+    display: none;
+  }
+
+  .nav-actions .mobile-action-btn {
+    font-size: 1.05rem;
+    padding: 0.8rem 1rem;
+    gap: 0.6rem;
+  }
+
+  .nav-actions .mobile-action-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .mobile-only-dark-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .mobile-nav-text {
     display: inline;
     margin-left: 0.5rem;
@@ -215,6 +236,10 @@
 
 @media (min-width: 769px) {
   .mobile-header-actions {
+    display: none !important;
+  }
+  
+  .mobile-only-dark-toggle {
     display: none !important;
   }
   

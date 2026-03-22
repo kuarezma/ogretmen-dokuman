@@ -82,7 +82,15 @@ const Navbar = () => {
           </Link>
 
           {/* Mobile Menu Toggle & Profile */}
-          <div className="mobile-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div className="mobile-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              className="btn btn-ghost mobile-only-dark-toggle"
+              onClick={toggleDarkMode}
+              title={isDark ? 'Açık Mod' : 'Karanlık Mod'}
+              style={{ padding: '0.4rem', color: 'var(--color-text-main)' }}
+            >
+              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
             {user ? (
               <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ alignItems: 'center', color: 'var(--color-primary)' }}>
                 {user.avatar_url ? (
@@ -141,21 +149,21 @@ const Navbar = () => {
                 </span>
                 <Link
                   to="/profile"
-                  className="btn btn-ghost nav-btn mobile-badge-profile"
+                  className="btn btn-ghost nav-btn mobile-badge-profile mobile-action-btn"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <User size={18} />
                   <span className="mobile-nav-text">Profil</span>
                 </Link>
                 <button 
-                  className="btn btn-outline nav-btn mobile-badge-upload"
+                  className="btn btn-outline nav-btn mobile-badge-upload mobile-action-btn"
                   onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
                 >
                   <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
                   <span className="mobile-nav-text">Belge Yükle</span>
                 </button>
                 <button 
-                  className="btn btn-ghost nav-btn mobile-badge-logout" 
+                  className="btn btn-ghost nav-btn mobile-badge-logout mobile-action-btn" 
                   onClick={handleLogout}
                 >
                   <LogOut size={18} />
@@ -165,13 +173,13 @@ const Navbar = () => {
             ) : (
               <>
                 <button 
-                  className="btn btn-ghost nav-btn mobile-badge-login" 
+                  className="btn btn-ghost nav-btn mobile-badge-login mobile-action-btn" 
                   onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
                 >
                   <User size={18} /> Giriş Yap
                 </button>
                 <button 
-                  className="btn btn-primary nav-btn mobile-badge-register" 
+                  className="btn btn-primary nav-btn mobile-badge-register mobile-action-btn" 
                   onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
                 >
                   <Users size={18} /> Kayıt Ol
