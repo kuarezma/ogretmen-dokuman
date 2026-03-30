@@ -67,6 +67,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
+        minHeight: 0,
         boxShadow: 'var(--shadow-xl)'
         }}>
         <div style={{

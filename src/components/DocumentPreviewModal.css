@@ -28,20 +28,25 @@
   }
 
   .preview-modal-dialog > div {
+    max-height: 100svh !important;
     max-height: 100dvh !important;
+    height: 100svh;
     height: 100dvh;
     border-radius: 0 !important;
+    min-height: 0;
   }
 
   .preview-modal-body {
-    min-height: 160px !important;
-    max-height: calc(100dvh - 200px);
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    max-height: none;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .preview-modal-body iframe {
-    min-height: 160px !important;
-    height: 36dvh !important;
+    min-height: 240px !important;
+    height: 100% !important;
   }
 
   .preview-modal-footer {
@@ -53,6 +58,7 @@
     background: var(--color-surface);
     z-index: 2;
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    flex-shrink: 0;
   }
 
   .preview-modal-footer > div,
