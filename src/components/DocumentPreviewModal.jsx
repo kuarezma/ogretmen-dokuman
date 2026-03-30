@@ -27,6 +27,12 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   const youtubeId = getYouTubeId(document.file_url);
   const driveId = getDriveId(document.file_url);
   const isPdf = document.file_url?.toLowerCase().includes('.pdf');
+  const isWord = document.file_url?.toLowerCase().includes('.doc');
+  const isExcel = document.file_url?.toLowerCase().includes('.xls');
+  const officeViewerUrl = document.file_url
+    ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`
+    : null;
+  const isThirdPartyFile = document.file_url && !document.file_url.includes('supabase.co');
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
@@ -103,7 +109,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
             />
           ) : isPdf ? (
             <iframe
-              src={document.file_url}
+              src={driveId ? `https://drive.google.com/file/d/${driveId}/preview` : document.file_url}
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
               title={document.title}
             />
@@ -113,6 +119,12 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
               title={document.title}
               allow="autoplay"
+            />
+          ) : (isWord || isExcel) && officeViewerUrl ? (
+            <iframe
+              src={officeViewerUrl}
+              style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
+              title={document.title}
             />
           ) : document.file_url ? (
             <div style={{
@@ -242,6 +254,19 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
             )}
           </div>
         </div>
+
+        {isThirdPartyFile && (
+          <div style={{
+            padding: '1rem 1.5rem',
+            borderTop: '1px solid var(--color-border)',
+            background: 'rgba(245, 158, 11, 0.12)',
+            color: 'var(--color-text)',
+            fontSize: '0.9rem',
+            lineHeight: '1.5'
+          }}>
+            Harici bağlantı ile eklenen dosyalarda önizleme ancak bağlantı herkese açıksa çalışır. Erişim uyarısı görüyorsanız dosyayı herkese açık paylaşın veya siteye doğrudan yükleyin.
+          </div>
+        )}
 
         {document.description && (
           <div style={{

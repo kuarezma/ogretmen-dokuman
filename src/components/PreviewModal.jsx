@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, FileText, Image as ImageIcon, Loader } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, FileText, ExternalLink, Loader } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-hot-toast';
 import './PreviewModal.css';
@@ -21,6 +21,20 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
 
   if (!isOpen || !document) return null;
 
+  const getDriveId = (url) => {
+    if (!url) return null;
+    const patterns = [
+      /drive\.google\.com\/file\/d\/([^/?]+)/,
+      /drive\.google\.com\/open\?id=([^&]+)/,
+      /drive\.google\.com\/uc\?id=([^&]+)/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
+  };
+
   const getFileType = () => {
     const type = document.type?.toLowerCase() || '';
     const url = document.file_url?.toLowerCase() || '';
@@ -33,6 +47,8 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
   };
 
   const fileType = getFileType();
+  const driveId = getDriveId(document.file_url);
+  const isThirdPartyFile = document.file_url && !document.file_url.includes('supabase.co');
 
   const handleDownload = async () => {
     if (!document.file_url) {
@@ -90,6 +106,10 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
     }
 
     if (fileType === 'pdf') {
+      const pdfSource = driveId
+        ? `https://drive.google.com/file/d/${driveId}/preview`
+        : `${document.file_url}#page=${currentPage}`;
+
       return (
         <div className="preview-pdf-container">
           {isLoading && (
@@ -99,7 +119,7 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
             </div>
           )}
           <iframe
-            src={`${document.file_url}#page=${currentPage}`}
+            src={pdfSource}
             className="preview-iframe"
             title={document.title}
             onLoad={() => setIsLoading(false)}
@@ -130,7 +150,10 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
     }
 
     if (fileType === 'word' || fileType === 'excel') {
-      const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`;
+      const viewerUrl = driveId
+        ? `https://drive.google.com/file/d/${driveId}/preview`
+        : `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`;
+
       return (
         <div className="preview-office-container">
           {isLoading && (
@@ -150,9 +173,9 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
     }
 
     return (
-      <div className="preview-unsupported">
-        <FileText size={64} color="var(--color-text-muted)" />
-        <h3>Önizleme Desteklenmiyor</h3>
+        <div className="preview-unsupported">
+          <FileText size={64} color="var(--color-text-muted)" />
+          <h3>Önizleme Desteklenmiyor</h3>
         <p>Bu dosya türü için önizleme mevcut değil.</p>
         <button className="btn btn-primary" onClick={handleDownload}>
           <Download size={18} /> İndir
@@ -183,6 +206,34 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
             </button>
           </div>
         </div>
+
+        {isThirdPartyFile && (
+          <div
+            style={{
+              padding: '0.85rem 1.25rem',
+              background: 'rgba(245, 158, 11, 0.12)',
+              borderBottom: '1px solid rgba(245, 158, 11, 0.2)',
+              color: 'var(--color-text)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              flexWrap: 'wrap'
+            }}
+          >
+            <span style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>
+              Bu belge harici bir bağlantıda barınıyor. Önizleme için dosya bağlantısının herkese açık olması gerekir.
+            </span>
+            <a
+              href={document.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline btn-sm"
+            >
+              <ExternalLink size={16} /> Yeni Sekmede Aç
+            </a>
+          </div>
+        )}
 
         {fileType === 'pdf' && (
           <div className="preview-toolbar">
