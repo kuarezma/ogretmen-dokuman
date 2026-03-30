@@ -80,6 +80,78 @@ const Navbar = () => {
     { to: '/stats', icon: <BarChart2 size={16}/>, label: 'İstatistikler', className: 'nav-badge-stats' }
   ], []);
 
+  const renderNavLinks = (isMobile = false) => (
+    <div className={isMobile ? 'mobile-menu-links' : 'nav-center-links'}>
+      {navLinks.map(link => (
+        <Link
+          key={link.to}
+          to={link.to}
+          className={`nav-badge-btn ${link.className} ${location.pathname === link.to ? 'active' : ''}`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          {link.icon} {link.label}
+        </Link>
+      ))}
+    </div>
+  );
+
+  const renderActionButtons = (isMobile = false) => (
+    <div className={isMobile ? 'mobile-menu-actions' : 'nav-actions-end'}>
+      {user ? (
+        <>
+          {!isMobile && (
+            <span className="welcome-text">
+              Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
+            </span>
+          )}
+          <Link
+            to="/profile"
+            className="btn btn-ghost nav-btn mobile-badge-profile"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <User size={18} />
+            <span className={isMobile ? '' : 'mobile-nav-text'}>{isMobile ? 'Profil' : 'Profil'}</span>
+          </Link>
+          <button
+            className="btn btn-ghost nav-btn mobile-badge-logout"
+            onClick={handleLogout}
+          >
+            <LogOut size={18} />
+            <span className={isMobile ? '' : 'mobile-nav-text'}>{isMobile ? 'Çıkış Yap' : 'Çıkış Yap'}</span>
+          </button>
+          <button
+            className="btn btn-outline nav-btn mobile-badge-upload"
+            onClick={handleUploadClick}
+          >
+            <Upload size={18} />
+            <span className={isMobile ? '' : 'nav-btn-text'}>{isMobile ? 'Belge Yükle' : 'Yükle'}</span>
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            className="btn btn-outline nav-btn mobile-badge-upload"
+            onClick={handleUploadClick}
+          >
+            <Upload size={18} /> Belge Yükle
+          </button>
+          <button
+            className="btn btn-ghost nav-btn mobile-badge-login"
+            onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
+          >
+            <User size={18} /> Giriş Yap
+          </button>
+          <button
+            className="btn btn-primary nav-btn mobile-badge-register"
+            onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
+          >
+            <Users size={18} /> Kayıt Ol
+          </button>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <>
       <header className="navbar glass-panel">
@@ -114,75 +186,22 @@ const Navbar = () => {
             </button>
           </div>
 
-          <nav className={`nav-actions ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-            <div className="nav-center-links">
-              {navLinks.map(link => (
-                <Link 
-                  key={link.to} 
-                  to={link.to} 
-                  className={`nav-badge-btn ${link.className} ${location.pathname === link.to ? 'active' : ''}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.icon} {link.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="nav-actions-end">
-              {user ? (
-                <>
-                  <span className="welcome-text">
-                    Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
-                  </span>
-                  <Link
-                    to="/profile"
-                    className="btn btn-ghost nav-btn mobile-badge-profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <User size={18} />
-                    <span className="mobile-nav-text">Profil</span>
-                  </Link>
-                  <button 
-                    className="btn btn-ghost nav-btn mobile-badge-logout" 
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={18} />
-                    <span className="mobile-nav-text">Çıkış Yap</span>
-                  </button>
-                  <button 
-                    className="btn btn-outline nav-btn mobile-badge-upload"
-                    onClick={handleUploadClick}
-                  >
-                    <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
-                    <span className="mobile-nav-text">Belge Yükle</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button 
-                    className="btn btn-outline nav-btn mobile-badge-upload"
-                    onClick={handleUploadClick}
-                  >
-                    <Upload size={18} /> Belge Yükle
-                  </button>
-                  <button 
-                    className="btn btn-ghost nav-btn mobile-badge-login" 
-                    onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
-                  >
-                    <User size={18} /> Giriş Yap
-                  </button>
-                  <button 
-                    className="btn btn-primary nav-btn mobile-badge-register" 
-                    onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
-                  >
-                    <Users size={18} /> Kayıt Ol
-                  </button>
-                </>
-              )}
-            </div>
+          <nav className="nav-actions">
+            {renderNavLinks()}
+            {renderActionButtons()}
           </nav>
         </div>
       </header>
+
+      <div
+        className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <div className="mobile-menu-panel glass-panel" onClick={(e) => e.stopPropagation()}>
+          {renderNavLinks(true)}
+          {renderActionButtons(true)}
+        </div>
+      </div>
 
       <AuthModal 
         isOpen={isAuthOpen} 
