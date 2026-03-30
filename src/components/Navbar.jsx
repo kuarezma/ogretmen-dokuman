@@ -158,65 +158,67 @@ const Navbar = () => {
               ))}
             </div>
 
-            <button
-              className="btn btn-ghost nav-btn dark-toggle"
-              onClick={toggleDarkMode}
-              title={isDark ? 'Açık Mod' : 'Karanlık Mod'}
-              style={{ padding: '0.4rem 0.6rem' }}
-            >
-              {isDark ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+            <div className="nav-actions-end">
+              <button
+                className="btn btn-ghost nav-btn dark-toggle"
+                onClick={toggleDarkMode}
+                title={isDark ? 'Açık Mod' : 'Karanlık Mod'}
+                style={{ padding: '0.4rem 0.6rem' }}
+              >
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
 
-            {user ? (
-              <>
-                <span className="welcome-text">
-                  Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
-                </span>
-                <Link
-                  to="/profile"
-                  className="btn btn-ghost nav-btn mobile-badge-profile"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <User size={18} />
-                  <span className="mobile-nav-text">Profil</span>
-                </Link>
-                <button 
-                  className="btn btn-ghost nav-btn mobile-badge-logout" 
-                  onClick={handleLogout}
-                >
-                  <LogOut size={18} />
-                  <span className="mobile-nav-text">Çıkış Yap</span>
-                </button>
-                <button 
-                  className="btn btn-outline nav-btn mobile-badge-upload"
-                  onClick={handleUploadClick}
-                >
-                  <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
-                  <span className="mobile-nav-text">Belge Yükle</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <button 
-                  className="btn btn-outline nav-btn mobile-badge-upload"
-                  onClick={handleUploadClick}
-                >
-                  <Upload size={18} /> Belge Yükle
-                </button>
-                <button 
-                  className="btn btn-ghost nav-btn mobile-badge-login" 
-                  onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
-                >
-                  <User size={18} /> Giriş Yap
-                </button>
-                <button 
-                  className="btn btn-primary nav-btn mobile-badge-register" 
-                  onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
-                >
-                  <Users size={18} /> Kayıt Ol
-                </button>
-              </>
-            )}
+              {user ? (
+                <>
+                  <span className="welcome-text">
+                    Hoşgeldin, <strong><Link to="/profile" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{user.username}</Link></strong>
+                  </span>
+                  <Link
+                    to="/profile"
+                    className="btn btn-ghost nav-btn mobile-badge-profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User size={18} />
+                    <span className="mobile-nav-text">Profil</span>
+                  </Link>
+                  <button 
+                    className="btn btn-ghost nav-btn mobile-badge-logout" 
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={18} />
+                    <span className="mobile-nav-text">Çıkış Yap</span>
+                  </button>
+                  <button 
+                    className="btn btn-outline nav-btn mobile-badge-upload"
+                    onClick={handleUploadClick}
+                  >
+                    <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
+                    <span className="mobile-nav-text">Belge Yükle</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    className="btn btn-outline nav-btn mobile-badge-upload"
+                    onClick={handleUploadClick}
+                  >
+                    <Upload size={18} /> Belge Yükle
+                  </button>
+                  <button 
+                    className="btn btn-ghost nav-btn mobile-badge-login" 
+                    onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
+                  >
+                    <User size={18} /> Giriş Yap
+                  </button>
+                  <button 
+                    className="btn btn-primary nav-btn mobile-badge-register" 
+                    onClick={() => { handleRegisterClick(); setIsMobileMenuOpen(false); }}
+                  >
+                    <Users size={18} /> Kayıt Ol
+                  </button>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       </header>
