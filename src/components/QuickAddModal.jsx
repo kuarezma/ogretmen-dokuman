@@ -26,14 +26,7 @@ const CATEGORY_OPTIONS = [
   "Sunum (Slayt)", "Diğer"
 ];
 
-const TYPE_OPTIONS = [
-  { value: 'word', label: 'Word', color: '#2563eb' },
-  { value: 'pdf', label: 'PDF', color: '#dc2626' },
-  { value: 'excel', label: 'Excel', color: '#16a34a' }
-];
-
 const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
-  const [activeTab, setActiveTab] = useState('url');
   const [formData, setFormData] = useState({
     title: '',
     topic: '',
@@ -41,8 +34,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
     lesson: '',
     category: '',
     file_url: '',
-    description: '',
-    type: 'pdf'
+    description: ''
   });
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,14 +65,8 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
 
-    if (activeTab === 'url' && !formData.file_url) {
-      setError('Dosya bağlantısı (URL) zorunludur.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (activeTab === 'file' && !file) {
-      setError('Lütfen bir dosya seçin.');
+    if (!formData.file_url && !file) {
+      setError('Lütfen bir dosya bağlantısı ekleyin veya dosya yükleyin.');
       setIsSubmitting(false);
       return;
     }
@@ -88,7 +74,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       let fileUrl = formData.file_url;
 
-      if (activeTab === 'file' && file) {
+      if (file) {
         toast.loading('Dosya yükleniyor...', { id: 'upload' });
         
         const fileExt = file.name.split('.').pop();
@@ -121,7 +107,6 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           grade: formData.grade,
           lesson: formData.lesson || null,
           category: formData.category || 'Diğer',
-          type: formData.type,
           file_url: fileUrl,
           description: formData.description || null,
           uploaded_by: currentUser?.username || 'Anonim',
@@ -141,7 +126,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
         onSuccess?.(data);
         onClose();
         setFormData({
-          title: '', topic: '', grade: '', lesson: '', category: '', file_url: '', description: '', type: 'pdf'
+          title: '', topic: '', grade: '', lesson: '', category: '', file_url: '', description: ''
         });
         setFile(null);
         setSuccess(false);
@@ -153,15 +138,6 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: '', topic: '', grade: '', lesson: '', category: '', file_url: '', description: '', type: 'pdf'
-    });
-    setFile(null);
-    setError('');
-    setSuccess(false);
   };
 
   return (
@@ -180,7 +156,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
         background: 'var(--color-surface)',
         borderRadius: 'var(--radius-xl)',
         width: '100%',
-        maxWidth: '520px',
+        maxWidth: '480px',
         maxHeight: '90vh',
         overflow: 'auto',
         boxShadow: 'var(--shadow-xl)'
@@ -223,53 +199,6 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           </button>
         </div>
 
-        <div style={{
-          display: 'flex',
-          borderBottom: '1px solid var(--color-border)',
-          padding: '0 1.5rem'
-        }}>
-          <button
-            onClick={() => { setActiveTab('url'); resetForm(); }}
-            style={{
-              flex: 1,
-              padding: '1rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'url' ? '2px solid var(--color-primary)' : '2px solid transparent',
-              color: activeTab === 'url' ? 'var(--color-primary)' : 'var(--color-text-muted)',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}
-          >
-            <LinkIcon size={18} /> URL ile Ekle
-          </button>
-          <button
-            onClick={() => { setActiveTab('file'); resetForm(); }}
-            style={{
-              flex: 1,
-              padding: '1rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'file' ? '2px solid var(--color-primary)' : '2px solid transparent',
-              color: activeTab === 'file' ? 'var(--color-primary)' : 'var(--color-text-muted)',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}
-          >
-            <UploadCloud size={18} /> Dosya Yükle
-          </button>
-        </div>
-
         <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
           {error && (
             <div style={{
@@ -285,7 +214,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           )}
 
-          <div style={{ marginBottom: '1.25rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
             <label style={{
               display: 'block',
               marginBottom: '0.5rem',
@@ -306,7 +235,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
             />
           </div>
 
-          <div style={{ marginBottom: '1.25rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
             <label style={{
               display: 'block',
               marginBottom: '0.5rem',
@@ -314,203 +243,144 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
               fontWeight: '500',
               color: 'var(--color-text)'
             }}>
-              Konu / Açıklama
+              Sınıf *
             </label>
-            <input
-              type="text"
-              name="topic"
-              value={formData.topic}
+            <select
+              name="grade"
+              value={formData.grade}
               onChange={handleChange}
-              placeholder="Örn: Doğal Sayılar"
               className="input-field"
-            />
+              required
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="">Seçiniz</option>
+              {GRADE_OPTIONS.map(grade => (
+                <option key={grade} value={grade}>{grade}</option>
+              ))}
+            </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)'
-              }}>
-                Sınıf *
-              </label>
-              <select
-                name="grade"
-                value={formData.grade}
-                onChange={handleChange}
-                className="input-field"
-                required
-                style={{ cursor: 'pointer' }}
-              >
-                <option value="">Seçiniz</option>
-                {GRADE_OPTIONS.map(grade => (
-                  <option key={grade} value={grade}>{grade}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)'
-              }}>
-                Ders
-              </label>
-              <select
-                name="lesson"
-                value={formData.lesson}
-                onChange={handleChange}
-                className="input-field"
-                style={{ cursor: 'pointer' }}
-              >
-                <option value="">Seçiniz</option>
-                {LESSON_OPTIONS.map(lesson => (
-                  <option key={lesson} value={lesson}>{lesson}</option>
-                ))}
-              </select>
-            </div>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Ders
+            </label>
+            <select
+              name="lesson"
+              value={formData.lesson}
+              onChange={handleChange}
+              className="input-field"
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="">Seçiniz</option>
+              {LESSON_OPTIONS.map(lesson => (
+                <option key={lesson} value={lesson}>{lesson}</option>
+              ))}
+            </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)'
-              }}>
-                Kategori
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="input-field"
-                style={{ cursor: 'pointer' }}
-              >
-                <option value="">Seçiniz</option>
-                {CATEGORY_OPTIONS.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)'
-              }}>
-                Dosya Türü
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className="input-field"
-                style={{ cursor: 'pointer' }}
-              >
-                {TYPE_OPTIONS.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </select>
-            </div>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Kategori
+            </label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="input-field"
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="">Seçiniz</option>
+              {CATEGORY_OPTIONS.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
 
-          {activeTab === 'url' ? (
-            <div style={{ marginBottom: '1.25rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)'
-              }}>
-                Dosya Bağlantısı (URL) *
-              </label>
-              <div style={{ position: 'relative' }}>
-                <LinkIcon size={16} style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--color-text-muted)'
-                }} />
-                <input
-                  type="url"
-                  name="file_url"
-                  value={formData.file_url}
-                  onChange={handleChange}
-                  placeholder="https://drive.google.com/..."
-                  className="input-field"
-                  style={{ paddingLeft: '2.75rem' }}
-                />
-              </div>
-              <p style={{
-                marginTop: '0.5rem',
-                fontSize: '0.75rem',
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Dosya Bağlantısı (URL)
+            </label>
+            <div style={{ position: 'relative' }}>
+              <LinkIcon size={16} style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
                 color: 'var(--color-text-muted)'
-              }}>
-                Google Drive, Dropbox veya doğrudan dosya bağlantısı ekleyebilirsiniz.
+              }} />
+              <input
+                type="url"
+                name="file_url"
+                value={formData.file_url}
+                onChange={handleChange}
+                placeholder="https://drive.google.com/..."
+                className="input-field"
+                style={{ paddingLeft: '2.75rem' }}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              veya Dosya Yükle
+            </label>
+            <div 
+              style={{
+                border: '2px dashed var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.5rem',
+                textAlign: 'center',
+                cursor: 'pointer',
+                background: file ? 'rgba(16, 185, 129, 0.05)' : 'var(--color-surface-hover)',
+                borderColor: file ? 'var(--color-success)' : 'var(--color-border)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <input 
+                type="file" 
+                onChange={handleFileChange}
+                style={{ 
+                  position: 'absolute',
+                  top: 0, left: 0, width: '100%', height: '100%', 
+                  opacity: 0, cursor: 'pointer' 
+                }} 
+              />
+              <UploadCloud size={28} color={file ? 'var(--color-success)' : 'var(--color-text-muted)'} style={{ margin: '0 auto 0.5rem', position: 'relative' }} />
+              <p style={{ color: file ? 'var(--color-success)' : 'var(--color-text-muted)', fontSize: '0.875rem', position: 'relative' }}>
+                {file ? (
+                  <strong>Seçilen: {file.name}</strong>
+                ) : (
+                  <span>Tıkla ve dosya seç (PDF, Word, Excel)</span>
+                )}
               </p>
             </div>
-          ) : (
-            <div style={{ marginBottom: '1.25rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)'
-              }}>
-                Dosya Seç *
-              </label>
-              <div 
-                style={{
-                  border: '2px dashed var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '2rem',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  background: file ? 'rgba(16, 185, 129, 0.05)' : 'var(--color-surface-hover)',
-                  borderColor: file ? 'var(--color-success)' : 'var(--color-border)',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <input 
-                  type="file" 
-                  onChange={handleFileChange}
-                  style={{ 
-                    position: 'absolute',
-                    top: 0, left: 0, width: '100%', height: '100%', 
-                    opacity: 0, cursor: 'pointer' 
-                  }} 
-                />
-                <UploadCloud size={32} color={file ? 'var(--color-success)' : 'var(--color-text-muted)'} style={{ margin: '0 auto 0.5rem', position: 'relative' }} />
-                <p style={{ color: file ? 'var(--color-success)' : 'var(--color-text-muted)', fontSize: '0.9rem', position: 'relative' }}>
-                  {file ? (
-                    <strong>Seçilen: {file.name}</strong>
-                  ) : (
-                    <span>Dosyanızı seçmek için <strong>tıklayın</strong></span>
-                  )}
-                </p>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginTop: '0.5rem', position: 'relative' }}>
-                  PDF, Word, Excel dosyaları desteklenir. Maksimum 25MB.
-                </p>
-              </div>
-            </div>
-          )}
+          </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
             <label style={{
               display: 'block',
               marginBottom: '0.5rem',
