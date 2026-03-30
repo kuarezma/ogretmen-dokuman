@@ -97,7 +97,7 @@ app.post('/api/documents', async (req, res) => {
     if (err) return res.status(400).json({ ok: false, message: 'Dosya yükleme hatası.' });
     const file = req.file;
     if (!file) return res.status(400).json({ ok: false, message: 'Dosya seçiniz.' });
-    const { title, description, file_type, category } = req.body || {};
+    const { title, description, file_type, category, answer_key_text, solution_url } = req.body || {};
     const ext = (file.originalname || '').split('.').pop().toLowerCase();
     const allowed = { word: ['doc', 'docx'], excel: ['xls', 'xlsx'], pdf: ['pdf'] };
     const type = file_type || (allowed.pdf.includes(ext) ? 'pdf' : allowed.word.includes(ext) ? 'word' : allowed.excel.includes(ext) ? 'excel' : 'other');
@@ -110,6 +110,8 @@ app.post('/api/documents', async (req, res) => {
         description: description || '',
         file_type: type,
         category: category || 'diger',
+        answer_key_text: answer_key_text || null,
+        solution_url: solution_url || null,
         file_name: file.originalname,
         file_path: file.filename,
         file_size: file.size
@@ -125,7 +127,7 @@ app.post('/api/documents', async (req, res) => {
 // --- API: Belge ara
 app.get('/api/documents', async (req, res) => {
   const { type, q, category } = req.query;
-  let query = supabase.from('documents').select('id, title, description, file_type, category, file_name, file_size, created_at, username:users(username)');
+  let query = supabase.from('documents').select('id, title, description, file_type, category, file_name, file_size, answer_key_text, solution_url, created_at, username:users(username)');
   if (type && type !== 'tumu') query = query.eq('file_type', type);
   if (category && category !== 'tumu') query = query.eq('category', category);
   if (q && q.trim()) {

@@ -344,6 +344,12 @@ const DocumentCard = ({ document }) => {
             </span>
           )}
 
+          {document.solution_url && (
+            <span className="category-badge" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: '#16a34a' }}>
+              Çözümlü
+            </span>
+          )}
+
           <span className="category-badge">{document.category}</span>
         </div>
       </div>

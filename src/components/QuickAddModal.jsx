@@ -34,7 +34,9 @@ const INITIAL_FORM_DATA = {
   lesson: '',
   category: '',
   file_url: '',
-  type: 'pdf'
+  type: 'pdf',
+  answer_key_text: '',
+  solution_url: ''
 };
 
 const inferFileType = (fileName = '') => {
@@ -142,6 +144,8 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           lesson: formData.lesson,
           category: formData.category,
           file_url: fileUrl,
+          answer_key_text: formData.answer_key_text || null,
+          solution_url: formData.solution_url || null,
           uploaded_by: uploaderName,
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
           created_at: new Date().toISOString(),
@@ -155,11 +159,11 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
 
       setSuccess(true);
       toast.success('Belge başarıyla eklendi!');
-      setTimeout(() => {
-        onSuccess?.(data);
-        onClose();
-        setFormData(INITIAL_FORM_DATA);
-        setFile(null);
+        setTimeout(() => {
+          onSuccess?.(data);
+          onClose();
+          setFormData(INITIAL_FORM_DATA);
+          setFile(null);
         setSuccess(false);
       }, 1500);
     } catch (err) {
@@ -392,6 +396,47 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
                 style={{ paddingLeft: '2.75rem' }}
               />
             </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Cevap Anahtarı (Metin)
+            </label>
+            <textarea
+              name="answer_key_text"
+              value={formData.answer_key_text}
+              onChange={handleChange}
+              placeholder="Cevap anahtarını buraya yazın..."
+              className="input-field"
+              rows={3}
+              style={{ resize: 'vertical', minHeight: '80px' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Çözüm PDF (Drive Link)
+            </label>
+            <input
+              type="url"
+              name="solution_url"
+              value={formData.solution_url}
+              onChange={handleChange}
+              placeholder="https://drive.google.com/..."
+              className="input-field"
+            />
           </div>
 
           <div style={{ marginBottom: '1rem' }}>

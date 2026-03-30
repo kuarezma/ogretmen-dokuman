@@ -19,6 +19,8 @@ db.exec(`
     user_id INTEGER NOT NULL,
     title TEXT NOT NULL,
     description TEXT,
+    answer_key_text TEXT,
+    solution_url TEXT,
     file_type TEXT NOT NULL,
     category TEXT NOT NULL,
     file_name TEXT NOT NULL,

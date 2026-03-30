@@ -1,7 +1,9 @@
-import React from 'react';
-import { X, Download, Eye, Calendar, User, ExternalLink, Play } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Download, Eye, Calendar, User, ExternalLink, Play, Key } from 'lucide-react';
 
 const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
+  const [showAnswerKey, setShowAnswerKey] = useState(false);
+
   if (!isOpen || !document) return null;
 
   const getYouTubeId = (url) => {
@@ -34,6 +36,12 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
     ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`
     : null;
   const isThirdPartyFile = document.file_url && !document.file_url.includes('supabase.co') && !driveId;
+  const hasAnswerKey = Boolean(document.answer_key_text);
+  const hasSolution = Boolean(document.solution_url);
+
+  useEffect(() => {
+    setShowAnswerKey(false);
+  }, [document.id]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
@@ -229,7 +237,28 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
             </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {hasAnswerKey && (
+              <button
+                type="button"
+                onClick={() => setShowAnswerKey(prev => !prev)}
+                className="btn btn-outline"
+                style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', display: 'inline-flex' }}
+              >
+                <Key size={14} /> {showAnswerKey ? 'Anahtarı Gizle' : 'Cevap Anahtarı'}
+              </button>
+            )}
+            {hasSolution && (
+              <a
+                href={document.solution_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', display: 'inline-flex' }}
+              >
+                <ExternalLink size={14} /> Çözüm PDF
+              </a>
+            )}
             {document.download_count > 0 && (
               <span style={{
                 display: 'flex',
@@ -254,6 +283,35 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
             )}
           </div>
         </div>
+
+        {showAnswerKey && hasAnswerKey && (
+          <div style={{
+            padding: '1rem 1.5rem',
+            borderTop: '1px solid var(--color-border)',
+            background: 'var(--color-surface-hover)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '0.75rem',
+              color: 'var(--color-primary)',
+              fontWeight: '600'
+            }}>
+              <Key size={16} /> Cevap Anahtarı
+            </div>
+            <pre style={{
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              fontFamily: 'inherit',
+              fontSize: '0.9rem',
+              color: 'var(--color-text)'
+            }}>
+              {document.answer_key_text}
+            </pre>
+          </div>
+        )}
 
         {isThirdPartyFile && (
           <div style={{

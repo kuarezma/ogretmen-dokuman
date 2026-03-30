@@ -59,7 +59,9 @@ const Profile = () => {
     lesson: '',
     category: '',
     type: 'pdf',
-    file_url: ''
+    file_url: '',
+    answer_key_text: '',
+    solution_url: ''
   });
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   
@@ -277,7 +279,9 @@ const Profile = () => {
       lesson: doc.lesson || '',
       category: normalizeCategory(doc, myDocuments),
       type: doc.type || 'pdf',
-      file_url: doc.file_url || ''
+      file_url: doc.file_url || '',
+      answer_key_text: doc.answer_key_text || '',
+      solution_url: doc.solution_url || ''
     });
   };
 
@@ -311,7 +315,9 @@ const Profile = () => {
         lesson: editForm.lesson,
         category: editForm.category,
         type: editForm.type,
-        file_url: editForm.file_url.trim() || null
+        file_url: editForm.file_url.trim() || null,
+        answer_key_text: editForm.answer_key_text.trim() || null,
+        solution_url: editForm.solution_url.trim() || null
       };
 
       const { error } = await supabase
@@ -625,6 +631,32 @@ const Profile = () => {
                     onChange={handleEditFormChange}
                     className="input-field"
                     placeholder="https://..."
+                  />
+                </div>
+              </label>
+
+              <label className="edit-field">
+                <span>Cevap Anahtarı</span>
+                <textarea
+                  name="answer_key_text"
+                  value={editForm.answer_key_text}
+                  onChange={handleEditFormChange}
+                  className="input-field"
+                  rows="3"
+                  placeholder="Cevap anahtarı metni (opsiyonel)"
+                />
+              </label>
+
+              <label className="edit-field">
+                <span>Çözüm PDF (Drive Link)</span>
+                <div className="edit-link-field">
+                  <LinkIcon size={16} />
+                  <input
+                    name="solution_url"
+                    value={editForm.solution_url}
+                    onChange={handleEditFormChange}
+                    className="input-field"
+                    placeholder="https://drive.google.com/..."
                   />
                 </div>
               </label>
