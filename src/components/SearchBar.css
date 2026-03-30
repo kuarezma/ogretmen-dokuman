@@ -444,6 +444,13 @@
     grid-template-columns: 1fr;
   }
 
+  .filter-select {
+    padding: 0.95rem 2.85rem 0.95rem 0.9rem;
+    font-size: 0.9rem;
+    background-position: right 0.85rem center;
+    background-size: 0.9em;
+  }
+
   .search-actions {
     flex-direction: column;
     align-items: stretch;

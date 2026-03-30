@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, Download, Eye, Calendar, User, ExternalLink, Play, Key } from 'lucide-react';
+import './DocumentPreviewModal.css';
 
 const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   const [showAnswerKey, setShowAnswerKey] = useState(false);
@@ -55,18 +56,9 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0, 0, 0, 0.7)',
-      backdropFilter: 'blur(4px)',
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem'
-    }} onClick={onClose}>
-      <div style={{
+    <div className="preview-modal-overlay" onClick={onClose}>
+      <div className="preview-modal-dialog" onClick={(e) => e.stopPropagation()}>
+        <div style={{
         background: 'var(--color-surface)',
         borderRadius: 'var(--radius-xl)',
         width: '100%',
@@ -76,7 +68,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
         display: 'flex',
         flexDirection: 'column',
         boxShadow: 'var(--shadow-xl)'
-      }} onClick={(e) => e.stopPropagation()}>
+        }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -109,7 +101,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
           </button>
         </div>
 
-        <div style={{ flex: 1, overflow: 'auto', background: 'var(--color-background)', minHeight: '400px' }}>
+        <div className="preview-modal-body" style={{ flex: 1, overflow: 'auto', background: 'var(--color-background)', minHeight: '400px' }}>
           {youtubeId ? (
             <iframe
               src={`https://www.youtube.com/embed/${youtubeId}`}
@@ -202,7 +194,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
           )}
         </div>
 
-        <div style={{
+        <div className="preview-modal-footer" style={{
           padding: '1rem 1.5rem',
           borderTop: '1px solid var(--color-border)',
           display: 'flex',
@@ -345,6 +337,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
         )}
       </div>
     </div>
+  </div>
   );
 };
 
