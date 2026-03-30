@@ -18,6 +18,18 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+    }
+    
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
