@@ -441,11 +441,19 @@
   }
 
   .filters-wrapper {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.65rem;
+  }
+
+  .filter-group {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
   }
 
   .filter-select {
-    padding: 0.95rem 2.85rem 0.95rem 0.9rem;
+    padding: 0.95rem 2.4rem 0.95rem 0.9rem;
     font-size: 0.9rem;
     background-position: right 0.85rem center;
     background-size: 0.9em;
@@ -463,13 +471,18 @@
   }
 
   .advanced-filters {
-    grid-template-columns: 1fr;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem;
   }
 
   .advanced-filter-group,
   .filter-group {
     min-width: 0;
+    width: 100%;
+  }
+
+  .advanced-filter-group {
     width: 100%;
   }
 }
