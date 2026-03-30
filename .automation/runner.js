@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 "use strict";
 const { execSync } = require('child_process');
-const path = require('path');
 
 function run(cmd) {
   console.log(`>> ${cmd}`);
@@ -30,7 +29,7 @@ function main() {
         yamlTasks[yamlTasks.length - 1].command = cmd;
       }
     }
-  } catch (e) {
+  } catch {
     // ignore if no tasks.yaml
   }
   const matched = yamlTasks.find(t => t.id === task);

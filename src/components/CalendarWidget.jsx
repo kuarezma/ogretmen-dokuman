@@ -15,9 +15,8 @@ const EVENTS = [
 ];
 
 const CalendarWidget = () => {
-  const today = new Date();
-  
   const processedEvents = useMemo(() => {
+    const today = new Date();
     return EVENTS.map(event => {
       const start = new Date(event.startDate);
       const end = new Date(event.endDate);
@@ -39,7 +38,7 @@ const CalendarWidget = () => {
 
       return { ...event, status };
     });
-  }, [today]);
+  }, []);
 
   const visibleEvents = processedEvents
     .filter(e => e.status !== 'past')

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { X, Download, Eye, Calendar, User, ExternalLink, Play, Key } from 'lucide-react';
 import './DocumentPreviewModal.css';
 
@@ -38,11 +38,6 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   const isThirdPartyFile = doc.file_url && !doc.file_url.includes('supabase.co') && !driveId;
   const hasAnswerKey = Boolean(doc.answer_key_text);
   const hasSolution = Boolean(doc.solution_url);
-
-  useEffect(() => {
-    if (!isOpen || !document) return;
-    setShowAnswerKey(false);
-  }, [isOpen, document?.id]);
 
   if (!isOpen || !document) return null;
 

@@ -66,7 +66,7 @@ const Leaderboard = () => {
     }
   };
 
-  const getBadgeName = (score) => {
+  const getBadgeName = () => {
     return "Öğretmen";
   };
 

@@ -23,13 +23,31 @@ const getDriveId = (url) => {
   return null;
 };
 
+const DocumentAnswerKeyBlock = ({ document: doc }) => {
+  const [showAnswerKey, setShowAnswerKey] = useState(false);
+  const hasAnswerKey = Boolean(doc.answer_key_text);
+  if (!hasAnswerKey) return null;
+  return (
+    <>
+      <button className="btn btn-outline" onClick={() => setShowAnswerKey(prev => !prev)} style={{ display: 'inline-flex' }}>
+        <Key size={14} /> {showAnswerKey ? 'Anahtarı Gizle' : 'Cevap Anahtarı'}
+      </button>
+      {showAnswerKey && (
+        <div className="glass-panel" style={{ padding: '1rem', width: '100%', flexBasis: '100%' }}>
+          <div style={{ marginBottom: '0.5rem', fontWeight: 600, color: 'var(--color-primary)' }}>Cevap Anahtarı</div>
+          <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>{doc.answer_key_text}</pre>
+        </div>
+      )}
+    </>
+  );
+};
+
 const DocumentPreviewPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [document, setDocument] = useState(location.state?.document || null);
   const [loading, setLoading] = useState(!location.state?.document);
-  const [showAnswerKey, setShowAnswerKey] = useState(false);
 
   useEffect(() => {
     const loadDocument = async () => {
@@ -42,10 +60,6 @@ const DocumentPreviewPage = () => {
 
     loadDocument();
   }, [id, document]);
-
-  useEffect(() => {
-    setShowAnswerKey(false);
-  }, [document?.id]);
 
   if (loading) {
     return (
@@ -77,7 +91,6 @@ const DocumentPreviewPage = () => {
   const officeViewerUrl = document.file_url
     ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`
     : null;
-  const hasAnswerKey = Boolean(document.answer_key_text);
   const hasSolution = Boolean(document.solution_url);
 
   return (
@@ -143,12 +156,8 @@ const DocumentPreviewPage = () => {
             {hasSolution && <span className="category-badge" style={{ background: 'rgba(34,197,94,0.1)', color: '#16a34a' }}>Çözümlü</span>}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {hasAnswerKey && (
-              <button className="btn btn-outline" onClick={() => setShowAnswerKey(prev => !prev)} style={{ display: 'inline-flex' }}>
-                <Key size={14} /> {showAnswerKey ? 'Anahtarı Gizle' : 'Cevap Anahtarı'}
-              </button>
-            )}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <DocumentAnswerKeyBlock key={document.id} document={document} />
             {hasSolution && (
               <a href={document.solution_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ display: 'inline-flex' }}>
                 <ExternalLink size={14} /> Çözüm PDF
@@ -160,13 +169,6 @@ const DocumentPreviewPage = () => {
               </a>
             )}
           </div>
-
-          {showAnswerKey && hasAnswerKey && (
-            <div className="glass-panel" style={{ padding: '1rem' }}>
-              <div style={{ marginBottom: '0.5rem', fontWeight: 600, color: 'var(--color-primary)' }}>Cevap Anahtarı</div>
-              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>{document.answer_key_text}</pre>
-            </div>
-          )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--color-text-muted)', fontSize: '0.85rem', flexWrap: 'wrap' }}>
             {document.uploader && <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><User size={14} /> {document.uploader}</span>}

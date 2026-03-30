@@ -24,12 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-function getUserId(req) {
-  const sid = req.cookies?.session;
-  if (!sid) return null;
-  return sid;
-}
-
 async function getUserFromSession(sid) {
   if (!sid) return null;
   const { data } = await supabase.from('sessions').select('user_id, users(id, username, email)').eq('id', sid).single();
@@ -50,7 +44,7 @@ app.post('/api/register', async (req, res) => {
       return res.status(500).json({ ok: false, message: error.message });
     }
     res.json({ ok: true, message: 'Kayıt başarılı. Giriş yapabilirsiniz.' });
-  } catch (e) {
+  } catch {
     res.status(500).json({ ok: false, message: 'Kayıt sırasında hata.' });
   }
 });
@@ -118,7 +112,7 @@ app.post('/api/documents', async (req, res) => {
       }).select();
       if (error) return res.status(500).json({ ok: false, message: error.message });
       res.json({ ok: true, id: data[0].id, message: 'Belge yüklendi.' });
-    } catch (e) {
+    } catch {
       res.status(500).json({ ok: false, message: 'Kayıt hatası.' });
     }
   });

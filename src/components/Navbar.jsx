@@ -7,8 +7,22 @@ import { supabase } from '../supabaseClient';
 import './Navbar.css';
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
-  const [isDark, setIsDark] = useState(false);
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('currentUser');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' && typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      return true;
+    }
+    return false;
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -28,19 +42,6 @@ const Navbar = () => {
       document.body.classList.remove('no-scroll');
     };
   }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setIsDark(true);
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  }, []);
 
   const toggleDarkMode = useCallback(() => {
     setIsDark(prevDark => {

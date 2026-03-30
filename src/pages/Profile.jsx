@@ -67,7 +67,7 @@ const Profile = () => {
   
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-  const getBadgeName = (score) => {
+  const getBadgeName = () => {
     return "Öğretmen";
   };
 

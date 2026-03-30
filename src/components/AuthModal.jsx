@@ -16,7 +16,7 @@ const AuthModal = ({ isOpen, onClose, isLoginView, onLoginSuccess }) => {
     setIsLoading(true);
     setError('');
     try {
-      const { data, error: googleError } = await supabase.auth.signInWithOAuth({
+      const { error: googleError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: window.location.origin

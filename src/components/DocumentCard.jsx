@@ -516,9 +516,10 @@ const DocumentCard = ({ document }) => {
         </div>
       )}
       
-      <DocumentPreviewModal 
-        isOpen={isPreviewOpen} 
-        onClose={() => setIsPreviewOpen(false)} 
+      <DocumentPreviewModal
+        key={document?.id}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
         document={document}
       />
     </div>

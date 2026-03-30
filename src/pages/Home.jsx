@@ -126,7 +126,7 @@ const Home = () => {
     setFilteredDocs(prev => [normalizedDoc, ...prev]);
   }, []);
 
-  const handleSearch = async ({ searchTerm, format, grade, lesson, category, sortBy = 'newest', dateRange = 'all' }) => {
+  const handleSearch = async ({ searchTerm, format, grade, lesson, category, dateRange = 'all' }) => {
     if (!searchTerm && format === 'all' && grade === 'Tüm Sınıflar' && category === 'Tüm Kategoriler' && dateRange === 'all') {
       setFilteredDocs(documents);
       setHasSearched(false);
@@ -249,6 +249,7 @@ const Home = () => {
       />
 
       <DocumentPreviewModal
+        key={previewDoc?.id ?? 'closed'}
         document={previewDoc}
         isOpen={!!previewDoc}
         onClose={() => setPreviewDoc(null)}
