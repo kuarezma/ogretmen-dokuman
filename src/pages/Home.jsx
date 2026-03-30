@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import SearchBar from '../components/SearchBar';
 import DocumentCard from '../components/DocumentCard';
-import { Sparkles, Folder, ChevronRight, ChevronLeft, Home as HomeIcon } from 'lucide-react';
+import { Sparkles, Folder, ChevronRight, ChevronLeft, Home as HomeIcon, Plus } from 'lucide-react';
 import Leaderboard from '../components/Leaderboard';
 import CalendarWidget from '../components/CalendarWidget';
 import LatestForumPosts from '../components/LatestForumPosts';
+import QuickAddModal from '../components/QuickAddModal';
+import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import './Home.css';
 
 const Home = () => {
@@ -14,6 +16,9 @@ const Home = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   // Kategori Hiyerarşisi State Yönetimi (0: Sınıf Seç, 1: Ders Seç, 2: Kategori Seç, 3: Belgeler)
   const [folderLevel, setFolderLevel] = useState(0); 
@@ -21,7 +26,37 @@ const Home = () => {
   
   useEffect(() => {
     fetchDocuments();
+    checkUser();
   }, []);
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      if (profile) {
+        setUser({ ...profile, email: session.user.email });
+      } else {
+        setUser({
+          id: session.user.id,
+          name: session.user.user_metadata?.name || 'Kullanıcı',
+          email: session.user.email
+        });
+      }
+    }
+  };
+
+  const handleQuickAddSuccess = (newDoc) => {
+    setDocuments([newDoc, ...documents]);
+    setFilteredDocs([newDoc, ...filteredDocs]);
+  };
+
+  const handlePreview = (doc) => {
+    setPreviewDoc(doc);
+  };
 
   const fetchDocuments = async () => {
     setIsLoading(true);
@@ -277,7 +312,31 @@ const Home = () => {
         </div>
         
         <SearchBar onSearch={handleSearch} />
+        
+        {user && (
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <button
+              onClick={() => setShowQuickAdd(true)}
+              className="btn btn-primary"
+              style={{ display: 'inline-flex', gap: '0.5rem' }}
+            >
+              <Plus size={18} /> Hızlı Belge Ekle
+            </button>
+          </div>
+        )}
       </section>
+
+      <QuickAddModal
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSuccess={handleQuickAddSuccess}
+      />
+
+      <DocumentPreviewModal
+        document={previewDoc}
+        isOpen={!!previewDoc}
+        onClose={() => setPreviewDoc(null)}
+      />
 
       {hasSearched ? (
         <section className="documents-section container animate-fade-in">
