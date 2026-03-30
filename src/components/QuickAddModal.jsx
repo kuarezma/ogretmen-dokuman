@@ -33,8 +33,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
     grade: '',
     lesson: '',
     category: '',
-    file_url: '',
-    description: ''
+    file_url: ''
   });
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
