@@ -295,25 +295,22 @@ const Profile = () => {
         file_url: editForm.file_url.trim() || null
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('documents')
         .update(payload)
         .eq('id', editingDocument.id)
-        .eq('uploaded_by', currentUser.username)
-        .select()
-        .maybeSingle();
+        .select('id');
 
       if (error) throw error;
-      if (!data) {
-        throw new Error('Belge bulunamadı veya bu belgeyi düzenleme yetkiniz yok.');
-      }
+
+      const updatedDocument = { ...editingDocument, ...payload };
 
       setMyDocuments(prev => prev.map(doc => (
-        doc.id === editingDocument.id ? { ...doc, ...data } : doc
+        doc.id === editingDocument.id ? updatedDocument : doc
       )));
 
       setFavoriteDocuments(prev => prev.map(doc => (
-        doc?.id === editingDocument.id ? { ...doc, ...data } : doc
+        doc?.id === editingDocument.id ? updatedDocument : doc
       )));
 
       setEditingDocument(null);
