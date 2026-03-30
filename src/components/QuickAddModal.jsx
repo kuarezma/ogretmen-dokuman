@@ -354,29 +354,39 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
                 borderRadius: 'var(--radius-lg)',
                 padding: '1.5rem',
                 textAlign: 'center',
-                cursor: 'pointer',
                 background: file ? 'rgba(16, 185, 129, 0.05)' : 'var(--color-surface-hover)',
                 borderColor: file ? 'var(--color-success)' : 'var(--color-border)',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                position: 'relative'
               }}
             >
-              <input 
-                type="file" 
-                onChange={handleFileChange}
-                style={{ 
-                  position: 'absolute',
-                  top: 0, left: 0, width: '100%', height: '100%', 
-                  opacity: 0, cursor: 'pointer' 
-                }} 
-              />
-              <UploadCloud size={28} color={file ? 'var(--color-success)' : 'var(--color-text-muted)'} style={{ margin: '0 auto 0.5rem', position: 'relative' }} />
-              <p style={{ color: file ? 'var(--color-success)' : 'var(--color-text-muted)', fontSize: '0.875rem', position: 'relative' }}>
+              <UploadCloud size={28} color={file ? 'var(--color-success)' : 'var(--color-text-muted)'} style={{ margin: '0 auto 0.5rem' }} />
+              <p style={{ color: file ? 'var(--color-success)' : 'var(--color-text-muted)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
                 {file ? (
                   <strong>Seçilen: {file.name}</strong>
                 ) : (
-                  <span>Tıkla ve dosya seç (PDF, Word, Excel)</span>
+                  'Dosya seç (PDF, Word, Excel)'
                 )}
               </p>
+              <label 
+                style={{
+                  display: 'inline-block',
+                  padding: '0.5rem 1rem',
+                  background: 'var(--color-primary)',
+                  color: 'white',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  fontWeight: '500'
+                }}
+              >
+                Dosya Seç
+                <input 
+                  type="file" 
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }} 
+                />
+              </label>
             </div>
           </div>
 
