@@ -301,9 +301,12 @@ const Profile = () => {
         .eq('id', editingDocument.id)
         .eq('uploaded_by', currentUser.username)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        throw new Error('Belge bulunamadı veya bu belgeyi düzenleme yetkiniz yok.');
+      }
 
       setMyDocuments(prev => prev.map(doc => (
         doc.id === editingDocument.id ? { ...doc, ...data } : doc
