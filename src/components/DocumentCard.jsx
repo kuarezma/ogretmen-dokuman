@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare, Star, Share2, Check } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-hot-toast';
@@ -15,6 +16,7 @@ const DocumentCard = ({ document }) => {
   const [downloadCount, setDownloadCount] = useState(document.download_count || 0);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const navigate = useNavigate();
   
   // Yorum State'leri
   const [comments, setComments] = useState([]);
@@ -252,6 +254,12 @@ const DocumentCard = ({ document }) => {
       toast.error("Bu belgenin dosyası henüz yüklenmemiş.");
       return;
     }
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      navigate(`/preview/${document.id}`, { state: { document } });
+      return;
+    }
+
     setIsPreviewOpen(true);
   };
 

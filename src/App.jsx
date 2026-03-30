@@ -8,6 +8,7 @@ import Requests from './pages/Requests';
 import Forum from './pages/Forum';
 import AiGenerator from './pages/AiGenerator';
 import AuthCallback from './pages/AuthCallback';
+import DocumentPreviewPage from './pages/DocumentPreviewPage';
 import './App.css';
 import DynamicBackground from './components/DynamicBackground';
 
@@ -47,6 +48,7 @@ function App() {
           <Route path="/requests" element={<Requests />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/ai-generator" element={<AiGenerator />} />
+          <Route path="/preview/:id" element={<DocumentPreviewPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/auth/confirm" element={<AuthCallback />} />
         </Routes>
@@ -56,4 +58,3 @@ function App() {
 }
 
 export default App;
-
