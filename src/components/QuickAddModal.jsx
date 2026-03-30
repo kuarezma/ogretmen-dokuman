@@ -33,7 +33,8 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
     grade: '',
     lesson: '',
     category: '',
-    file_url: ''
+    file_url: '',
+    type: 'pdf'
   });
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -305,6 +306,29 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
               {CATEGORY_OPTIONS.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Dosya Türü
+            </label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="input-field"
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="pdf">PDF</option>
+              <option value="word">Word</option>
+              <option value="excel">Excel</option>
             </select>
           </div>
 
