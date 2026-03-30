@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot, Users, Home } from 'lucide-react';
+import { BookOpen, User, LogOut, Upload, BarChart2, Menu, X, HandHelping, Bot, Users, Home } from 'lucide-react';
 import AuthModal from './AuthModal';
 import QuickAddModal from './QuickAddModal';
 import { supabase } from '../supabaseClient';
@@ -14,14 +14,6 @@ const Navbar = () => {
     } catch {
       return null;
     }
-  });
-  const [isDark, setIsDark] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark' && typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      return true;
-    }
-    return false;
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -42,20 +34,6 @@ const Navbar = () => {
       document.body.classList.remove('no-scroll');
     };
   }, [isMobileMenuOpen]);
-
-  const toggleDarkMode = useCallback(() => {
-    setIsDark(prevDark => {
-      const newDark = !prevDark;
-      if (newDark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-      }
-      return newDark;
-    });
-  }, []);
 
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
@@ -113,15 +91,7 @@ const Navbar = () => {
             <h1>Öğretmen<span> Döküman</span></h1>
           </Link>
 
-          <div className="mobile-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <button
-              className="btn btn-ghost mobile-only-dark-toggle"
-              onClick={toggleDarkMode}
-              title={isDark ? 'Açık Mod' : 'Karanlık Mod'}
-              style={{ padding: '0.4rem', color: 'var(--color-text-main)' }}
-            >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+          <div className="mobile-header-actions">
             {user ? (
               <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
                 {user.avatar_url ? (
@@ -159,15 +129,6 @@ const Navbar = () => {
             </div>
 
             <div className="nav-actions-end">
-              <button
-                className="btn btn-ghost nav-btn dark-toggle"
-                onClick={toggleDarkMode}
-                title={isDark ? 'Açık Mod' : 'Karanlık Mod'}
-                style={{ padding: '0.4rem 0.6rem' }}
-              >
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-
               {user ? (
                 <>
                   <span className="welcome-text">

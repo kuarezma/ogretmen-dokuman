@@ -210,7 +210,17 @@
   }
 
   .folder-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .folder-card {
+    padding: 0.95rem 0.75rem;
+  }
+
+  .folder-card h4 {
+    font-size: 0.9rem;
+    line-height: 1.25;
   }
 
   .documents-grid {
