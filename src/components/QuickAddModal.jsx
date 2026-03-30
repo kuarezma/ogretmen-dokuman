@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Upload, FileText, Link as LinkIcon, Check, UploadCloud } from 'lucide-react';
+import { X, Upload, FileText, Link as LinkIcon, Check, UploadCloud, Key } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-hot-toast';
 import './QuickAddModal.css';
@@ -279,6 +279,37 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
               rows={3}
               style={{ minHeight: '80px', resize: 'vertical' }}
             />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <Key size={14} style={{ verticalAlign: 'middle', marginRight: '0.35rem', opacity: 0.85 }} />
+              Cevap Anahtarı (Opsiyonel)
+            </label>
+            <textarea
+              name="answer_key_text"
+              value={formData.answer_key_text}
+              onChange={handleChange}
+              placeholder="Örn: 1-A, 2-B, 3-C veya kısa cevap metni"
+              className="input-field"
+              rows={3}
+              style={{ minHeight: '72px', resize: 'vertical' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Çözüm PDF (Drive veya doğrudan link, opsiyonel)</label>
+            <div className="input-with-icon">
+              <LinkIcon size={16} className="input-icon" />
+              <input
+                type="url"
+                name="solution_url"
+                value={formData.solution_url}
+                onChange={handleChange}
+                placeholder="https://drive.google.com/..."
+                className="input-field has-icon"
+              />
+            </div>
           </div>
 
           <button
