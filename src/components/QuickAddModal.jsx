@@ -21,7 +21,7 @@ const LESSON_OPTIONS = [
 ];
 
 const CATEGORY_OPTIONS = [
-  "Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan",
+  "Yazılı Soruları", "Deneme Sınavı", "Yaprak Test", "Yıllık Plan", "Günlük Plan",
   "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı",
   "Sunum (Slayt)", "Diğer"
 ];

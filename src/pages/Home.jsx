@@ -65,6 +65,50 @@ const Home = () => {
     setFilteredDocs(prev => [normalizedDoc, ...prev]);
   };
 
+  const LEGACY_TEST_CATEGORY = 'Deneme / Test';
+  const DOC_CATEGORIES = [
+    'Yazılı Soruları',
+    'Deneme Sınavı',
+    'Yaprak Test',
+    'Yıllık Plan',
+    'Günlük Plan',
+    'Proje / Performans',
+    'Zümre Tutanakları',
+    'Etkinlik / Çalışma Kağıdı',
+    'Sunum (Slayt)',
+    'Diğer'
+  ];
+
+  const normalizeCategory = (doc, docs = []) => {
+    if (doc.category !== LEGACY_TEST_CATEGORY) return doc.category;
+
+    const haystack = `${doc.title || ''} ${doc.topic || ''} ${doc.file_name || ''}`.toLowerCase();
+    if (haystack.includes('yaprak')) return 'Yaprak Test';
+    if (haystack.includes('deneme') || haystack.includes('sinav') || haystack.includes('sınav')) return 'Deneme Sınavı';
+
+    const latestLegacyDoc = [...docs]
+      .filter(item => item.category === LEGACY_TEST_CATEGORY)
+      .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))[0];
+
+    return latestLegacyDoc && latestLegacyDoc.id === doc.id ? 'Yaprak Test' : 'Deneme Sınavı';
+  };
+
+  const normalizeDocuments = (docs = []) => docs.map(doc => ({
+    ...doc,
+    category: normalizeCategory(doc, docs),
+    description: doc.topic,
+    uploader: doc.uploaded_by,
+    downloads: doc.download_count || 0
+  }));
+
+  const applyCategoryFilter = (query, category) => {
+    if (category === 'Deneme Sınavı' || category === 'Yaprak Test') {
+      return query.in('category', [category, LEGACY_TEST_CATEGORY]);
+    }
+
+    return query.eq('category', category);
+  };
+
   const handlePreview = (doc) => {
     setPreviewDoc(doc);
   };
@@ -93,12 +137,7 @@ const Home = () => {
 
       if (error) throw error;
 
-      const mappedDocs = (data || []).map(doc => ({
-        ...doc,
-        description: doc.topic,
-        uploader: doc.uploaded_by,
-        downloads: 0
-      }));
+      const mappedDocs = normalizeDocuments(data || []);
 
       setDocuments(mappedDocs);
       setFilteredDocs(mappedDocs);
@@ -139,7 +178,7 @@ const Home = () => {
       }
 
       if (category && category !== 'Tüm Kategoriler') {
-        query = query.eq('category', category);
+        query = applyCategoryFilter(query, category);
       }
 
       if (dateRange !== 'all') {
@@ -190,12 +229,7 @@ const Home = () => {
       const { data, error } = await query;
       if (error) throw error;
 
-      const mappedDocs = (data || []).map(doc => ({
-        ...doc,
-        description: doc.topic,
-        uploader: doc.uploaded_by,
-        downloads: doc.download_count || 0
-      }));
+      const mappedDocs = normalizeDocuments(data || []);
 
       setFilteredDocs(mappedDocs);
     } catch (err) {
@@ -225,8 +259,6 @@ const Home = () => {
     "12. Sınıf": ["Türk Dili ve Edebiyatı", "Matematik", "Fizik", "Kimya", "Biyoloji", "T.C. İnkılap Tarihi", "Coğrafya", "İngilizce", "Almanca", "Din Kültürü", "Meslek Dersleri", "Diğer"],
     "Genel / Ortak": ["Klavuzlar", "Yönetmelikler", "Rehberlik", "Sınıf Öğretmenliği", "ŞÖK Toplantıları", "Veli Toplantıları", "Diğer"]
   };
-  const DOC_CATEGORIES = ["Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
-
   const handleGradeClick = (gradeName) => {
     setCurrentPath({ grade: gradeName, lesson: null, category: null });
     setFolderLevel(1);

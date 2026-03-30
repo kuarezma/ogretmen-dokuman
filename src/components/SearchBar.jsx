@@ -20,7 +20,7 @@ const GRADE_LESSONS = {
   "Genel / Ortak": ["Tüm Dersler", "Klavuzlar", "Yönetmelikler", "Rehberlik", "Sınıf Öğretmenliği", "ŞÖK Toplantıları", "Veli Toplantıları", "Diğer"]
 };
 
-const DOC_CATEGORIES = ["Tüm Kategoriler", "Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
+const DOC_CATEGORIES = ["Tüm Kategoriler", "Yazılı Soruları", "Deneme Sınavı", "Yaprak Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'En Yeni' },

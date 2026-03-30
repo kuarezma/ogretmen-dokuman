@@ -21,10 +21,26 @@ const LESSON_OPTIONS = [
 ];
 
 const CATEGORY_OPTIONS = [
-  "Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan",
+  "Yazılı Soruları", "Deneme Sınavı", "Yaprak Test", "Yıllık Plan", "Günlük Plan",
   "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı",
   "Sunum (Slayt)", "Diğer"
 ];
+
+const LEGACY_TEST_CATEGORY = 'Deneme / Test';
+
+const normalizeCategory = (doc, docs = []) => {
+  if (doc.category !== LEGACY_TEST_CATEGORY) return doc.category;
+
+  const haystack = `${doc.title || ''} ${doc.topic || ''} ${doc.file_name || ''}`.toLowerCase();
+  if (haystack.includes('yaprak')) return 'Yaprak Test';
+  if (haystack.includes('deneme') || haystack.includes('sinav') || haystack.includes('sınav')) return 'Deneme Sınavı';
+
+  const latestLegacyDoc = [...docs]
+    .filter(item => item.category === LEGACY_TEST_CATEGORY)
+    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))[0];
+
+  return latestLegacyDoc && latestLegacyDoc.id === doc.id ? 'Yaprak Test' : 'Deneme Sınavı';
+};
 
 const TYPE_OPTIONS = ['pdf', 'word', 'excel'];
 
@@ -149,7 +165,10 @@ const Profile = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMyDocuments(data || []);
+      setMyDocuments((data || []).map(doc => ({
+        ...doc,
+        category: normalizeCategory(doc, data || [])
+      })));
     } catch (err) {
       console.error("Belgeleriniz yüklenirken hata oluştu:", err);
     } finally {
@@ -256,7 +275,7 @@ const Profile = () => {
       topic: doc.topic || '',
       grade: doc.grade || '',
       lesson: doc.lesson || '',
-      category: doc.category || '',
+      category: normalizeCategory(doc, myDocuments),
       type: doc.type || 'pdf',
       file_url: doc.file_url || ''
     });
