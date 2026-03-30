@@ -390,7 +390,6 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
           <button
             type="submit"
             disabled={isSubmitting || success}
