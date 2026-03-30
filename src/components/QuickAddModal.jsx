@@ -105,10 +105,9 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           title: formData.title,
           topic: formData.topic || formData.title,
           grade: formData.grade,
-          lesson: formData.lesson || null,
-          category: formData.category || 'Diğer',
+          lesson: formData.lesson,
+          category: formData.category,
           file_url: fileUrl,
-          description: formData.description || null,
           uploaded_by: currentUser?.username || 'Anonim',
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
           created_at: new Date().toISOString(),
@@ -126,7 +125,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
         onSuccess?.(data);
         onClose();
         setFormData({
-          title: '', topic: '', grade: '', lesson: '', category: '', file_url: '', description: ''
+          title: '', topic: '', grade: '', lesson: '', category: '', file_url: ''
         });
         setFile(null);
         setSuccess(false);
@@ -393,26 +392,6 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              color: 'var(--color-text)'
-            }}>
-              Açıklama
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Belge hakkında ek bilgi..."
-              className="input-field"
-              rows={3}
-              style={{ resize: 'vertical', minHeight: '80px' }}
-            />
-          </div>
-
           <button
             type="submit"
             disabled={isSubmitting || success}
