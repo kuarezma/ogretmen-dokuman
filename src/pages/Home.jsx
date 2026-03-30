@@ -6,6 +6,7 @@ import { Sparkles, Folder, ChevronRight, ChevronLeft, Home as HomeIcon, Plus } f
 import Leaderboard from '../components/Leaderboard';
 import CalendarWidget from '../components/CalendarWidget';
 import LatestForumPosts from '../components/LatestForumPosts';
+import AuthModal from '../components/AuthModal';
 import QuickAddModal from '../components/QuickAddModal';
 import DocumentPreviewModal from '../components/DocumentPreviewModal';
 import './Home.css';
@@ -19,6 +20,7 @@ const Home = () => {
   const [user, setUser] = useState(null);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [previewDoc, setPreviewDoc] = useState(null);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   // Kategori Hiyerarşisi State Yönetimi (0: Sınıf Seç, 1: Ders Seç, 2: Kategori Seç, 3: Belgeler)
   const [folderLevel, setFolderLevel] = useState(0); 
@@ -65,6 +67,20 @@ const Home = () => {
 
   const handlePreview = (doc) => {
     setPreviewDoc(doc);
+  };
+
+  const handleUploadEntryClick = () => {
+    if (user) {
+      setShowQuickAdd(true);
+    } else {
+      setIsAuthOpen(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    checkUser();
+    setIsAuthOpen(false);
+    setShowQuickAdd(true);
   };
 
   const fetchDocuments = async () => {
@@ -322,18 +338,28 @@ const Home = () => {
         
         <SearchBar onSearch={handleSearch} />
         
-        {user && (
-          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <button
-              onClick={() => setShowQuickAdd(true)}
-              className="btn btn-primary"
-              style={{ display: 'inline-flex', gap: '0.5rem' }}
-            >
-              <Plus size={18} /> Hızlı Belge Ekle
-            </button>
-          </div>
-        )}
+        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <button
+            onClick={handleUploadEntryClick}
+            className="btn btn-primary"
+            style={{ display: 'inline-flex', gap: '0.5rem' }}
+          >
+            <Plus size={18} /> Belge Yükle
+          </button>
+          {!user && (
+            <p style={{ marginTop: '0.75rem', color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+              Sitedeki tüm içerikler herkese açık. Belge yüklemek için giriş yapmanız yeterli.
+            </p>
+          )}
+        </div>
       </section>
+
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        isLoginView={true}
+        onLoginSuccess={handleAuthSuccess}
+      />
 
       <QuickAddModal
         isOpen={showQuickAdd}

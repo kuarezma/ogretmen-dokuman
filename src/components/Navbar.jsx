@@ -70,6 +70,16 @@ const Navbar = () => {
     window.location.reload();
   };
 
+  const handleUploadClick = () => {
+    if (user) {
+      setIsUploadOpen(true);
+    } else {
+      setIsLoginView(true);
+      setIsAuthOpen(true);
+    }
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <>
       <header className="navbar glass-panel">
@@ -164,7 +174,7 @@ const Navbar = () => {
                 </button>
                 <button 
                   className="btn btn-outline nav-btn mobile-badge-upload"
-                  onClick={() => { setIsUploadOpen(true); setIsMobileMenuOpen(false); }}
+                  onClick={handleUploadClick}
                 >
                   <Upload size={18} /> <span className="nav-btn-text">Yükle</span>
                   <span className="mobile-nav-text">Belge Yükle</span>
@@ -172,6 +182,12 @@ const Navbar = () => {
               </>
             ) : (
               <>
+                <button 
+                  className="btn btn-outline nav-btn mobile-badge-upload"
+                  onClick={handleUploadClick}
+                >
+                  <Upload size={18} /> Belge Yükle
+                </button>
                 <button 
                   className="btn btn-ghost nav-btn mobile-badge-login" 
                   onClick={() => { handleLoginClick(); setIsMobileMenuOpen(false); }}
