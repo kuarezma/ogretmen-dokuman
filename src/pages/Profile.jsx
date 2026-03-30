@@ -1,7 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { User, FileText, Trash2, Calendar, Download, Eye, Heart, Star, TrendingUp, MessageSquare } from 'lucide-react';
+import { User, FileText, Trash2, Calendar, Download, Star, PenSquare, Save, X, Link as LinkIcon } from 'lucide-react';
 import './Profile.css';
+
+const GRADE_OPTIONS = [
+  "Okul Öncesi", "1. Sınıf", "2. Sınıf", "3. Sınıf", "4. Sınıf",
+  "5. Sınıf", "6. Sınıf", "7. Sınıf", "8. Sınıf",
+  "9. Sınıf", "10. Sınıf", "11. Sınıf", "12. Sınıf", "Genel / Ortak"
+];
+
+const LESSON_OPTIONS = [
+  "Türkçe", "Matematik", "Fen Bilimleri", "Sosyal Bilgiler", "İngilizce",
+  "Din Kültürü", "Hayat Bilgisi", "Müzik", "Görsel Sanatlar", "Beden Eğitimi",
+  "Bilişim Teknolojileri", "Teknoloji ve Tasarım", "Fizik", "Kimya", "Biyoloji",
+  "Tarih", "Coğrafya", "T.C. İnkılap Tarihi", "Türk Dili ve Edebiyatı",
+  "Felsefe", "Almanca", "Meslek Dersleri", "Okuma Yazma Öğreniyorum",
+  "İnsan Hakları", "Seçmeli Dersler", "Oyun ve Etkinlik", "Boyama",
+  "Masal / Hikaye", "Rehberlik", "Sınıf Öğretmenliği", "ŞÖK Toplantıları",
+  "Veli Toplantıları", "Klavuzlar", "Yönetmelikler", "Diğer"
+];
+
+const CATEGORY_OPTIONS = [
+  "Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan",
+  "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı",
+  "Sunum (Slayt)", "Diğer"
+];
+
+const TYPE_OPTIONS = ['pdf', 'word', 'excel'];
 
 const Profile = () => {
   const [myDocuments, setMyDocuments] = useState([]);
@@ -10,6 +35,17 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [userStats, setUserStats] = useState({ totalDownloads: 0, totalLikes: 0, totalComments: 0, score: 0 });
+  const [editingDocument, setEditingDocument] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    topic: '',
+    grade: '',
+    lesson: '',
+    category: '',
+    type: 'pdf',
+    file_url: ''
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
@@ -213,6 +249,80 @@ const Profile = () => {
     }
   };
 
+  const openEditModal = (doc) => {
+    setEditingDocument(doc);
+    setEditForm({
+      title: doc.title || '',
+      topic: doc.topic || '',
+      grade: doc.grade || '',
+      lesson: doc.lesson || '',
+      category: doc.category || '',
+      type: doc.type || 'pdf',
+      file_url: doc.file_url || ''
+    });
+  };
+
+  const closeEditModal = () => {
+    if (isSavingEdit) return;
+    setEditingDocument(null);
+  };
+
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateDocument = async (e) => {
+    e.preventDefault();
+
+    if (!editingDocument) return;
+
+    if (!editForm.title || !editForm.grade || !editForm.lesson || !editForm.category) {
+      alert('Başlık, sınıf, ders ve kategori alanları zorunludur.');
+      return;
+    }
+
+    setIsSavingEdit(true);
+
+    try {
+      const payload = {
+        title: editForm.title.trim(),
+        topic: editForm.topic.trim() || editForm.title.trim(),
+        grade: editForm.grade,
+        lesson: editForm.lesson,
+        category: editForm.category,
+        type: editForm.type,
+        file_url: editForm.file_url.trim() || null
+      };
+
+      const { data, error } = await supabase
+        .from('documents')
+        .update(payload)
+        .eq('id', editingDocument.id)
+        .eq('uploaded_by', currentUser.username)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setMyDocuments(prev => prev.map(doc => (
+        doc.id === editingDocument.id ? { ...doc, ...data } : doc
+      )));
+
+      setFavoriteDocuments(prev => prev.map(doc => (
+        doc?.id === editingDocument.id ? { ...doc, ...data } : doc
+      )));
+
+      setEditingDocument(null);
+      alert('Belge bilgileri güncellendi.');
+    } catch (err) {
+      console.error("Belge güncellenemedi:", err);
+      alert(`Belge güncellenemedi: ${err.message}`);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
   const getFormatBadge = (type) => {
     return (
       <span className={`format-badge format-${type.toLowerCase()}`}>
@@ -339,17 +449,27 @@ const Profile = () => {
                     {getFormatBadge(doc.type)}
                     <span className="category-badge">{doc.category}</span>
                   </div>
-                  <button 
-                    className="delete-btn" 
-                    onClick={() => handleDelete(doc.id, doc.file_url)}
-                    title="Bu belgeyi sil"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div className="profile-doc-actions-inline">
+                    <button
+                      className="edit-btn"
+                      onClick={() => openEditModal(doc)}
+                      title="Bu belgeyi düzenle"
+                    >
+                      <PenSquare size={18} />
+                    </button>
+                    <button 
+                      className="delete-btn" 
+                      onClick={() => handleDelete(doc.id, doc.file_url)}
+                      title="Bu belgeyi sil"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="doc-card-body">
                   <h3 className="doc-title">{doc.title}</h3>
+                  <p className="doc-desc">{doc.topic}</p>
                   <div className="doc-info" style={{ marginTop: '1rem', borderTop: 'none', paddingTop: 0 }}>
                     <div className="info-item">
                       <Calendar size={14} />
@@ -368,6 +488,150 @@ const Profile = () => {
           </div>
         )}
       </div>
+
+      {editingDocument && (
+        <div className="edit-modal-overlay" onClick={closeEditModal}>
+          <div className="edit-modal glass-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-modal-header">
+              <div>
+                <h3>Belgeyi Düzenle</h3>
+                <p>Yüklediğiniz belgenin bilgilerini güncelleyebilirsiniz.</p>
+              </div>
+              <button
+                type="button"
+                className="edit-modal-close"
+                onClick={closeEditModal}
+                disabled={isSavingEdit}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form className="edit-form" onSubmit={handleUpdateDocument}>
+              <label className="edit-field">
+                <span>Başlık *</span>
+                <input
+                  name="title"
+                  value={editForm.title}
+                  onChange={handleEditFormChange}
+                  className="input-field"
+                  required
+                />
+              </label>
+
+              <label className="edit-field">
+                <span>Açıklama</span>
+                <textarea
+                  name="topic"
+                  value={editForm.topic}
+                  onChange={handleEditFormChange}
+                  className="input-field"
+                  rows="3"
+                />
+              </label>
+
+              <div className="edit-grid">
+                <label className="edit-field">
+                  <span>Sınıf *</span>
+                  <select
+                    name="grade"
+                    value={editForm.grade}
+                    onChange={handleEditFormChange}
+                    className="input-field"
+                    required
+                  >
+                    <option value="">Seçiniz</option>
+                    {GRADE_OPTIONS.map(grade => (
+                      <option key={grade} value={grade}>{grade}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="edit-field">
+                  <span>Ders *</span>
+                  <select
+                    name="lesson"
+                    value={editForm.lesson}
+                    onChange={handleEditFormChange}
+                    className="input-field"
+                    required
+                  >
+                    <option value="">Seçiniz</option>
+                    {LESSON_OPTIONS.map(lesson => (
+                      <option key={lesson} value={lesson}>{lesson}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="edit-grid">
+                <label className="edit-field">
+                  <span>Kategori *</span>
+                  <select
+                    name="category"
+                    value={editForm.category}
+                    onChange={handleEditFormChange}
+                    className="input-field"
+                    required
+                  >
+                    <option value="">Seçiniz</option>
+                    {CATEGORY_OPTIONS.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="edit-field">
+                  <span>Dosya Türü</span>
+                  <select
+                    name="type"
+                    value={editForm.type}
+                    onChange={handleEditFormChange}
+                    className="input-field"
+                  >
+                    {TYPE_OPTIONS.map(type => (
+                      <option key={type} value={type}>{type.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <label className="edit-field">
+                <span>Dosya Bağlantısı</span>
+                <div className="edit-link-field">
+                  <LinkIcon size={16} />
+                  <input
+                    name="file_url"
+                    value={editForm.file_url}
+                    onChange={handleEditFormChange}
+                    className="input-field"
+                    placeholder="https://..."
+                  />
+                </div>
+              </label>
+
+              <div className="edit-modal-actions">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={closeEditModal}
+                  disabled={isSavingEdit}
+                >
+                  Vazgeç
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSavingEdit}
+                >
+                  <Save size={16} />
+                  {isSavingEdit ? 'Kaydediliyor...' : 'Kaydet'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
