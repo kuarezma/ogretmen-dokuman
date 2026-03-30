@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, FileText, Download, User as UserIcon, Calendar, Eye, Heart, MessageSquare, Star, Share2, Check } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-hot-toast';
-import PreviewModal from './PreviewModal';
+import DocumentPreviewModal from './DocumentPreviewModal';
 import './DocumentCard.css';
 
 const DocumentCard = ({ document }) => {
@@ -502,7 +502,7 @@ const DocumentCard = ({ document }) => {
         </div>
       )}
       
-      <PreviewModal 
+      <DocumentPreviewModal 
         isOpen={isPreviewOpen} 
         onClose={() => setIsPreviewOpen(false)} 
         document={document}
