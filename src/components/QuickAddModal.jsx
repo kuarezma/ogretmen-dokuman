@@ -59,8 +59,8 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
     setIsSubmitting(true);
     setError('');
 
-    if (!formData.title || !formData.grade) {
-      setError('Başlık ve sınıf alanları zorunludur.');
+    if (!formData.title || !formData.grade || !formData.lesson || !formData.category) {
+      setError('Başlık, sınıf, ders ve kategori alanları zorunludur.');
       setIsSubmitting(false);
       return;
     }
@@ -268,13 +268,14 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
               fontWeight: '500',
               color: 'var(--color-text)'
             }}>
-              Ders
+              Ders *
             </label>
             <select
               name="lesson"
               value={formData.lesson}
               onChange={handleChange}
               className="input-field"
+              required
               style={{ cursor: 'pointer' }}
             >
               <option value="">Seçiniz</option>
@@ -292,13 +293,14 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
               fontWeight: '500',
               color: 'var(--color-text)'
             }}>
-              Kategori
+              Kategori *
             </label>
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
               className="input-field"
+              required
               style={{ cursor: 'pointer' }}
             >
               <option value="">Seçiniz</option>
