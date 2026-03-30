@@ -4,8 +4,6 @@ import { X, Download, Eye, Calendar, User, ExternalLink, Play, Key } from 'lucid
 const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   const [showAnswerKey, setShowAnswerKey] = useState(false);
 
-  if (!isOpen || !document) return null;
-
   const getYouTubeId = (url) => {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -40,8 +38,11 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   const hasSolution = Boolean(document.solution_url);
 
   useEffect(() => {
+    if (!isOpen || !document) return;
     setShowAnswerKey(false);
-  }, [document.id]);
+  }, [isOpen, document?.id]);
+
+  if (!isOpen || !document) return null;
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
