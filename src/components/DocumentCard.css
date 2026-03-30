@@ -1,7 +1,7 @@
 .doc-card {
   display: flex;
   flex-direction: column;
-  padding: 1rem 1rem 0.5rem 1rem;
+  padding: 1.25rem 1.15rem 0.85rem 1.15rem;
   transition: transform var(--transition-bounce), box-shadow var(--transition-normal);
 }
 
@@ -50,26 +50,28 @@
 }
 
 .doc-title {
-  font-size: 1rem;
-  margin-bottom: 0.4rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.35;
-  font-weight: 600;
-}
-
-.doc-desc {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.4;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.doc-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
 }
 
 .doc-card-footer {
