@@ -48,6 +48,7 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
 
   const fileType = getFileType();
   const driveId = getDriveId(document.file_url);
+  const isDriveFile = Boolean(driveId);
   const isThirdPartyFile = document.file_url && !document.file_url.includes('supabase.co');
 
   const handleDownload = async () => {
@@ -106,9 +107,25 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
     }
 
     if (fileType === 'pdf') {
-      const pdfSource = driveId
-        ? `https://drive.google.com/file/d/${driveId}/preview`
-        : `${document.file_url}#page=${currentPage}`;
+      if (isDriveFile) {
+        return (
+          <div className="preview-unsupported">
+            <FileText size={64} color="var(--color-text-muted)" />
+            <h3>Google Drive Belgesi</h3>
+            <p>Drive dosyaları site içinde her zaman kararlı önizlenemiyor. En güvenilir yöntem yeni sekmede açmak.</p>
+            <a
+              href={document.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+            >
+              <ExternalLink size={18} /> Google Drive'da Aç
+            </a>
+          </div>
+        );
+      }
+
+      const pdfSource = `${document.file_url}#page=${currentPage}`;
 
       return (
         <div className="preview-pdf-container">
@@ -150,9 +167,25 @@ const PreviewModal = ({ isOpen, onClose, document }) => {
     }
 
     if (fileType === 'word' || fileType === 'excel') {
-      const viewerUrl = driveId
-        ? `https://drive.google.com/file/d/${driveId}/preview`
-        : `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`;
+      if (isDriveFile) {
+        return (
+          <div className="preview-unsupported">
+            <FileText size={64} color="var(--color-text-muted)" />
+            <h3>Google Drive Belgesi</h3>
+            <p>Drive bağlantılı Word ve Excel dosyaları için en stabil seçenek belgeyi Drive üzerinde açmaktır.</p>
+            <a
+              href={document.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+            >
+              <ExternalLink size={18} /> Google Drive'da Aç
+            </a>
+          </div>
+        );
+      }
+
+      const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`;
 
       return (
         <div className="preview-office-container">

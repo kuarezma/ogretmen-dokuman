@@ -26,6 +26,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
 
   const youtubeId = getYouTubeId(document.file_url);
   const driveId = getDriveId(document.file_url);
+  const isDriveFile = Boolean(driveId);
   const isPdf = document.file_url?.toLowerCase().includes('.pdf');
   const isWord = document.file_url?.toLowerCase().includes('.doc');
   const isExcel = document.file_url?.toLowerCase().includes('.xls');
@@ -107,19 +108,84 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
               allowFullScreen
               title={document.title}
             />
+          ) : isPdf && isDriveFile ? (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              minHeight: '400px',
+              padding: '2rem',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: 'var(--radius-xl)',
+                background: 'var(--color-primary-light)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem'
+              }}>
+                <ExternalLink size={32} color="var(--color-primary)" />
+              </div>
+              <p style={{ color: 'var(--color-text)', marginBottom: '1rem' }}>
+                Google Drive belgelerini en güvenilir şekilde yeni sekmede açıyoruz.
+              </p>
+              <a
+                href={document.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ display: 'inline-flex' }}
+              >
+                <ExternalLink size={16} /> Google Drive'da Aç
+              </a>
+            </div>
           ) : isPdf ? (
             <iframe
-              src={driveId ? `https://drive.google.com/file/d/${driveId}/preview` : document.file_url}
+              src={document.file_url}
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
               title={document.title}
             />
           ) : driveId ? (
-            <iframe
-              src={`https://drive.google.com/file/d/${driveId}/preview`}
-              style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
-              title={document.title}
-              allow="autoplay"
-            />
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              minHeight: '400px',
+              padding: '2rem',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: 'var(--radius-xl)',
+                background: 'var(--color-primary-light)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem'
+              }}>
+                <ExternalLink size={32} color="var(--color-primary)" />
+              </div>
+              <p style={{ color: 'var(--color-text)', marginBottom: '1rem' }}>
+                Google Drive dosyasini site içinde önizlemek yerine yeni sekmede açıyoruz.
+              </p>
+              <a
+                href={document.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ display: 'inline-flex' }}
+              >
+                <ExternalLink size={16} /> Google Drive'da Aç
+              </a>
+            </div>
           ) : (isWord || isExcel) && officeViewerUrl ? (
             <iframe
               src={officeViewerUrl}
