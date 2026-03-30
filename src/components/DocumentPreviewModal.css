@@ -34,14 +34,14 @@
   }
 
   .preview-modal-body {
-    min-height: 180px !important;
-    max-height: calc(100dvh - 260px);
+    min-height: 160px !important;
+    max-height: calc(100dvh - 200px);
     overflow-y: auto;
   }
 
   .preview-modal-body iframe {
-    min-height: 180px !important;
-    height: 48dvh !important;
+    min-height: 160px !important;
+    height: 36dvh !important;
   }
 
   .preview-modal-footer {
@@ -58,6 +58,10 @@
   .preview-modal-footer > div,
   .preview-modal-footer > div:last-child {
     width: 100%;
+  }
+
+  .preview-modal-footer > div:first-child {
+    display: none;
   }
 
   .preview-modal-footer .btn,
