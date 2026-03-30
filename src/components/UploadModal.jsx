@@ -24,6 +24,16 @@ const GRADE_LESSONS = {
 
 const DOC_CATEGORIES = ["Yazılı Soruları", "Deneme / Test", "Yıllık Plan", "Günlük Plan", "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı", "Sunum (Slayt)", "Diğer"];
 
+const inferFileType = (fileName = '') => {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+
+  if (extension === 'pdf') return 'pdf';
+  if (['doc', 'docx'].includes(extension)) return 'word';
+  if (['xls', 'xlsx', 'csv'].includes(extension)) return 'excel';
+
+  return 'word';
+};
+
 const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -41,7 +51,9 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      setFormData(prev => ({ ...prev, type: inferFileType(selectedFile.name) }));
     }
   };
 
@@ -112,7 +124,7 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
         setSuccess(false);
         onUploadSuccess(data ? data[0] : null);
         onClose();
-        setFormData({ title: '', description: '', type: 'word', grade: 'Ortaokul (5-8)', lesson: 'Türkçe', category: 'Yazılı Soruları' });
+        setFormData({ title: '', description: '', type: 'word', grade: '5. Sınıf', lesson: 'Türkçe', category: 'Yazılı Soruları' });
         setFile(null);
       }, 1500);
 
@@ -241,6 +253,7 @@ const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                   id="file-upload"
                   type="file" 
                   onChange={handleFileChange} 
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv"
                   style={{ 
                     position: 'absolute',
                     top: 0, left: 0, width: '100%', height: '100%', 

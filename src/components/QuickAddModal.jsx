@@ -26,16 +26,29 @@ const CATEGORY_OPTIONS = [
   "Sunum (Slayt)", "Diğer"
 ];
 
+const INITIAL_FORM_DATA = {
+  title: '',
+  topic: '',
+  grade: '',
+  lesson: '',
+  category: '',
+  file_url: '',
+  type: 'pdf',
+  description: ''
+};
+
+const inferFileType = (fileName = '') => {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+
+  if (extension === 'pdf') return 'pdf';
+  if (['doc', 'docx'].includes(extension)) return 'word';
+  if (['xls', 'xlsx', 'csv'].includes(extension)) return 'excel';
+
+  return 'pdf';
+};
+
 const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    topic: '',
-    grade: '',
-    lesson: '',
-    category: '',
-    file_url: '',
-    type: 'pdf'
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -50,7 +63,9 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      setFormData(prev => ({ ...prev, type: inferFileType(selectedFile.name) }));
     }
   };
 
@@ -73,14 +88,31 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       let fileUrl = formData.file_url;
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+
+      if (!authUser) {
+        throw new Error('Belge yüklemek için giriş yapmalısınız.');
+      }
+
+      const storedUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      let username = storedUser?.username;
+
+      if (!username && authUser.email) {
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('username')
+          .eq('email', authUser.email)
+          .maybeSingle();
+
+        if (profileError) throw profileError;
+        username = profile?.username || authUser.email.split('@')[0];
+      }
 
       if (file) {
         toast.loading('Dosya yükleniyor...', { id: 'upload' });
-        
-        const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
         
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('documents')
           .upload(fileName, file);
 
@@ -98,19 +130,20 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
       }
 
       const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      const resolvedType = file ? inferFileType(file.name) : formData.type;
 
       const { data, error: insertError } = await supabase
         .from('documents')
         .insert([{
           title: formData.title,
           topic: formData.topic || formData.title,
-          type: formData.type,
+          type: resolvedType,
           grade: formData.grade,
           lesson: formData.lesson,
           category: formData.category,
           file_url: fileUrl,
           description: formData.description || null,
-          uploaded_by: currentUser?.username || 'Anonim',
+          uploaded_by: username || currentUser?.username || authUser.email?.split('@')[0] || 'Kullanıcı',
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
           created_at: new Date().toISOString(),
           download_count: 0,
@@ -126,9 +159,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
       setTimeout(() => {
         onSuccess?.(data);
         onClose();
-        setFormData({
-          title: '', topic: '', grade: '', lesson: '', category: '', file_url: ''
-        });
+        setFormData(INITIAL_FORM_DATA);
         setFile(null);
         setSuccess(false);
       }, 1500);
@@ -410,6 +441,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
                 <input 
                   type="file" 
                   onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv"
                   style={{ display: 'none' }} 
                 />
               </label>

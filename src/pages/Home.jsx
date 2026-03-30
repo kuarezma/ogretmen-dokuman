@@ -50,8 +50,17 @@ const Home = () => {
   };
 
   const handleQuickAddSuccess = (newDoc) => {
-    setDocuments([newDoc, ...documents]);
-    setFilteredDocs([newDoc, ...filteredDocs]);
+    if (!newDoc) return;
+
+    const normalizedDoc = {
+      ...newDoc,
+      description: newDoc.topic,
+      uploader: newDoc.uploaded_by,
+      downloads: newDoc.download_count || 0
+    };
+
+    setDocuments(prev => [normalizedDoc, ...prev]);
+    setFilteredDocs(prev => [normalizedDoc, ...prev]);
   };
 
   const handlePreview = (doc) => {
