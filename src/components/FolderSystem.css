@@ -1,0 +1,150 @@
+/* src/components/FolderSystem.css */
+.folder-system-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+
+.breadcrumb-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.breadcrumb-back:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  transform: translateX(-2px);
+}
+
+.breadcrumb-home {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.breadcrumb-home:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.breadcrumb-item {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item.active {
+  color: var(--color-text);
+  font-weight: 700;
+  cursor: default;
+}
+
+.breadcrumb-item:not(.active):hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-last {
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@media (max-width: 640px) {
+  .breadcrumb-last {
+    max-width: 150px;
+  }
+  
+  .breadcrumb-item, .breadcrumb-home, .breadcrumb-last {
+    font-size: 0.8rem;
+  }
+}
+
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+.folder-card.compact {
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 70px;
+  cursor: pointer;
+}
+
+.folder-icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+  fill: currentColor;
+  fill-opacity: 0.15;
+}
+
+.folder-icon.yellow { color: var(--color-warning); }
+.folder-icon.green { color: var(--color-success); }
+
+.folder-card h4 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .folder-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .folder-card.compact {
+    padding: 1rem;
+    min-height: 60px;
+  }
+  
+  .folder-card h4 {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .folder-grid {
+    grid-template-columns: 1fr;
+  }
+}

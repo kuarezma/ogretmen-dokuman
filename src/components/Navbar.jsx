@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot, Users, Home } from 'lucide-react';
 import AuthModal from './AuthModal';
@@ -15,7 +15,7 @@ const Navbar = () => {
   const [isLoginView, setIsLoginView] = useState(true);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 
-  const location = useLocation(); // Initialize useLocation hook
+  const location = useLocation();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
@@ -23,7 +23,6 @@ const Navbar = () => {
       setUser(JSON.parse(storedUser));
     }
     
-    // LocalStorage'dan dark mode tercihini oku
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDark(true);
@@ -31,46 +30,48 @@ const Navbar = () => {
     }
   }, []);
 
-  const toggleDarkMode = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    if (newDark) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    }
-  };
+  const toggleDarkMode = useCallback(() => {
+    setIsDark(prevDark => {
+      const newDark = !prevDark;
+      if (newDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      }
+      return newDark;
+    });
+  }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     localStorage.removeItem('currentUser');
     setUser(null);
     window.location.reload();
-  };
+  }, []);
 
-  const handleLoginClick = () => {
+  const handleLoginClick = useCallback(() => {
     setIsLoginView(true);
     setIsAuthOpen(true);
-  };
+  }, []);
 
-  const handleRegisterClick = () => {
+  const handleRegisterClick = useCallback(() => {
     setIsLoginView(false);
     setIsAuthOpen(true);
-  };
+  }, []);
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = useCallback(() => {
     const storedUser = localStorage.getItem('currentUser');
     setUser(JSON.parse(storedUser));
     window.location.reload();
-  };
+  }, []);
 
-  const handleUploadSuccess = () => {
+  const handleUploadSuccess = useCallback(() => {
     window.location.reload();
-  };
+  }, []);
 
-  const handleUploadClick = () => {
+  const handleUploadClick = useCallback(() => {
     if (user) {
       setIsUploadOpen(true);
     } else {
@@ -78,7 +79,15 @@ const Navbar = () => {
       setIsAuthOpen(true);
     }
     setIsMobileMenuOpen(false);
-  };
+  }, [user]);
+
+  const navLinks = useMemo(() => [
+    { to: '/', icon: <Home size={16}/>, label: 'Ana Sayfa', className: 'nav-badge-home' },
+    { to: '/requests', icon: <HandHelping size={16}/>, label: 'Talep Tahtası', className: 'nav-badge-requests' },
+    { to: '/forum', icon: <Users size={16}/>, label: 'Öğretmenler Odası', className: 'nav-badge-forum' },
+    { to: '/ai-generator', icon: <Bot size={16}/>, label: 'Yapay Zeka', className: 'nav-badge-ai' },
+    { to: '/stats', icon: <BarChart2 size={16}/>, label: 'İstatistikler', className: 'nav-badge-stats' }
+  ], []);
 
   return (
     <>
@@ -91,7 +100,6 @@ const Navbar = () => {
             <h1>Öğretmen<span> Döküman</span></h1>
           </Link>
 
-          {/* Mobile Menu Toggle & Profile */}
           <div className="mobile-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <button
               className="btn btn-ghost mobile-only-dark-toggle"
@@ -102,7 +110,7 @@ const Navbar = () => {
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             {user ? (
-              <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ alignItems: 'center', color: 'var(--color-primary)' }}>
+              <Link to="/profile" className="mobile-profile-btn-direct" aria-label="Profil" style={{ display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
                 {user.avatar_url ? (
                   <img src={user.avatar_url} alt="Profil" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-primary-light)' }} />
                 ) : (
@@ -110,7 +118,7 @@ const Navbar = () => {
                 )}
               </Link>
             ) : (
-              <button className="btn btn-ghost mobile-login-btn-direct" onClick={() => handleLoginClick()} style={{ padding: '0.4rem 0.6rem', fontSize: '0.9rem', color: 'var(--color-primary)' }}>
+              <button className="btn btn-ghost mobile-login-btn-direct" onClick={handleLoginClick} style={{ padding: '0.4rem 0.6rem', fontSize: '0.9rem', color: 'var(--color-primary)' }}>
                 Giriş
               </button>
             )}
@@ -124,23 +132,17 @@ const Navbar = () => {
           </div>
 
           <nav className={`nav-actions ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-            {/* Center Navigation Links */}
             <div className="nav-center-links">
-              <Link to="/" className={`nav-badge-btn nav-badge-home ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                <Home size={16}/> Ana Sayfa
-              </Link>
-              <Link to="/requests" className={`nav-badge-btn nav-badge-requests ${location.pathname === '/requests' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                <HandHelping size={16}/> Talep Tahtası
-              </Link>
-              <Link to="/forum" className={`nav-badge-btn nav-badge-forum ${location.pathname === '/forum' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                <Users size={16}/> Öğretmenler Odası
-              </Link>
-              <Link to="/ai-generator" className={`nav-badge-btn nav-badge-ai ${location.pathname === '/ai-generator' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                <Bot size={16}/> Yapay Zeka
-              </Link>
-              <Link to="/stats" className={`nav-badge-btn nav-badge-stats ${location.pathname === '/stats' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-                <BarChart2 size={16}/> İstatistikler
-              </Link>
+              {navLinks.map(link => (
+                <Link 
+                  key={link.to} 
+                  to={link.to} 
+                  className={`nav-badge-btn ${link.className} ${location.pathname === link.to ? 'active' : ''}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.icon} {link.label}
+                </Link>
+              ))}
             </div>
 
             <button
@@ -222,4 +224,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);
