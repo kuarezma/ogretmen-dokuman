@@ -5,6 +5,7 @@
   margin-bottom: 2rem;
   border-radius: 0;
   border-bottom: 1px solid var(--glass-border);
+  overflow: visible;
 }
 
 .nav-container {
@@ -16,6 +17,8 @@
   width: 100%;
   padding: 0 var(--container-padding);
   box-sizing: border-box;
+  position: relative;
+  overflow: visible;
 }
 
 .brand {
@@ -123,6 +126,8 @@
   align-items: center;
   gap: 0.45rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1003;
 }
 
 .mobile-menu-btn,
@@ -183,6 +188,8 @@
     pointer-events: none;
     transition: transform 0.3s ease, opacity 0.3s ease;
     overflow-y: auto;
+    z-index: 1002;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16);
   }
 
   .nav-actions.mobile-open {
