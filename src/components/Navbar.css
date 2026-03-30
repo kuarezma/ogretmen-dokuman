@@ -128,6 +128,11 @@
     justify-content: flex-start;
     padding: 0.6rem 0.8rem;
   }
+
+  .nav-actions .nav-badge-btn {
+    width: 100%;
+    justify-content: flex-start;
+  }
   
   .nav-actions .mobile-badge-profile {
     background-color: rgba(99, 102, 241, 0.1); color: #6366f1; border: none; border-radius: var(--radius-full);
@@ -201,6 +206,32 @@
 
   .nav-btn-text {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    height: 56px;
+    padding: 0 0.6rem;
+  }
+
+  .brand h1 {
+    font-size: 0.95rem;
+    line-height: 1.1;
+  }
+
+  .brand-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .nav-actions {
+    padding: 0.85rem;
+  }
+
+  .nav-badge-btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
   }
 }
 

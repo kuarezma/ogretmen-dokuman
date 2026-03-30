@@ -166,9 +166,42 @@
   .doc-card {
     padding: 0.75rem;
   }
+
+  .doc-card-header {
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
   
   .doc-title {
     font-size: 0.95rem;
+  }
+
+  .doc-card-footer {
+    gap: 0.6rem;
+  }
+
+  .doc-card-actions {
+    align-items: stretch;
+  }
+
+  .doc-card-buttons {
+    width: 100%;
+  }
+
+  .doc-card-buttons .btn,
+  .doc-card-buttons .interaction-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .doc-card-interactions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .share-btn,
+  .dl-btn {
+    width: 100%;
   }
 }
 

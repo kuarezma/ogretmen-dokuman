@@ -206,6 +206,85 @@
     text-align: center;
     padding: 1.5rem;
   }
+
+  .profile-stats {
+    width: 100%;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: 0;
+    padding: 0.9rem 1rem;
+  }
+
+  .my-docs-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-doc-card .doc-card-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .profile-doc-actions-inline {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 520px) {
+  .profile-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .profile-header {
+    padding: 1rem;
+  }
+
+  .profile-avatar {
+    width: 84px;
+    height: 84px;
+  }
+
+  .profile-info h1 {
+    font-size: 1.35rem;
+  }
+
+  .profile-info p {
+    font-size: 0.95rem;
+  }
+
+  .stat-card {
+    flex: 1 1 100%;
+  }
+
+  .section-header h2 {
+    font-size: 1.15rem;
+    gap: 0.5rem;
+  }
+
+  .edit-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .edit-modal {
+    padding: 1rem;
+  }
+
+  .edit-modal-header {
+    flex-direction: column;
+  }
+
+  .edit-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .edit-modal-actions .btn {
+    width: 100%;
+  }
 }
 
 .edit-modal-overlay {
