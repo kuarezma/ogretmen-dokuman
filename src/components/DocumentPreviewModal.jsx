@@ -3,6 +3,7 @@ import { X, Download, Eye, Calendar, User, ExternalLink, Play, Key } from 'lucid
 
 const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
   const [showAnswerKey, setShowAnswerKey] = useState(false);
+  const doc = document || {};
 
   const getYouTubeId = (url) => {
     if (!url) return null;
@@ -24,18 +25,18 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
     return null;
   };
 
-  const youtubeId = getYouTubeId(document.file_url);
-  const driveId = getDriveId(document.file_url);
+  const youtubeId = getYouTubeId(doc.file_url);
+  const driveId = getDriveId(doc.file_url);
   const drivePreviewUrl = driveId ? `https://drive.google.com/file/d/${driveId}/preview` : null;
-  const isPdf = document.file_url?.toLowerCase().includes('.pdf');
-  const isWord = document.file_url?.toLowerCase().includes('.doc');
-  const isExcel = document.file_url?.toLowerCase().includes('.xls');
-  const officeViewerUrl = document.file_url
-    ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(document.file_url)}`
+  const isPdf = doc.file_url?.toLowerCase().includes('.pdf');
+  const isWord = doc.file_url?.toLowerCase().includes('.doc');
+  const isExcel = doc.file_url?.toLowerCase().includes('.xls');
+  const officeViewerUrl = doc.file_url
+    ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(doc.file_url)}`
     : null;
-  const isThirdPartyFile = document.file_url && !document.file_url.includes('supabase.co') && !driveId;
-  const hasAnswerKey = Boolean(document.answer_key_text);
-  const hasSolution = Boolean(document.solution_url);
+  const isThirdPartyFile = doc.file_url && !doc.file_url.includes('supabase.co') && !driveId;
+  const hasAnswerKey = Boolean(doc.answer_key_text);
+  const hasSolution = Boolean(doc.solution_url);
 
   useEffect(() => {
     if (!isOpen || !document) return;
@@ -85,11 +86,11 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
         }}>
           <div>
             <h2 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--color-text)', marginBottom: '0.25rem' }}>
-              {document.title}
+              {doc.title}
             </h2>
-            {document.topic && (
+            {doc.topic && (
               <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                {document.topic}
+                {doc.topic}
               </p>
             )}
           </div>
@@ -115,27 +116,27 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              title={document.title}
+              title={doc.title}
             />
           ) : drivePreviewUrl ? (
             <iframe
               src={drivePreviewUrl}
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
-              title={document.title}
+              title={doc.title}
             />
           ) : isPdf ? (
             <iframe
-              src={document.file_url}
+              src={doc.file_url}
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
-              title={document.title}
+              title={doc.title}
             />
           ) : (isWord || isExcel) && officeViewerUrl ? (
             <iframe
               src={officeViewerUrl}
               style={{ width: '100%', height: '100%', minHeight: '400px', border: 'none' }}
-              title={document.title}
+              title={doc.title}
             />
-          ) : document.file_url ? (
+          ) : doc.file_url ? (
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -162,7 +163,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
                 Bu dosya türü önizlenemiyor
               </p>
               <a
-                href={document.file_url}
+                href={doc.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
@@ -217,7 +218,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
             fontSize: '0.875rem',
             color: 'var(--color-text-muted)'
           }}>
-            {document.grade && (
+            {doc.grade && (
               <span style={{
                 padding: '0.25rem 0.75rem',
                 background: 'var(--color-primary-light)',
@@ -225,16 +226,16 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
                 borderRadius: 'var(--radius-full)',
                 fontWeight: '500'
               }}>
-                {document.grade}
+              {doc.grade}
               </span>
             )}
-            {document.lesson && (
+            {doc.lesson && (
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <User size={14} /> {document.lesson}
+                <User size={14} /> {doc.lesson}
               </span>
             )}
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-              <Calendar size={14} /> {formatDate(document.created_at)}
+              <Calendar size={14} /> {formatDate(doc.created_at)}
             </span>
           </div>
 
@@ -251,7 +252,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
             )}
             {hasSolution && (
               <a
-                href={document.solution_url}
+                href={doc.solution_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
@@ -260,7 +261,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
                 <ExternalLink size={14} /> Çözüm PDF
               </a>
             )}
-            {document.download_count > 0 && (
+            {doc.download_count > 0 && (
               <span style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -268,12 +269,12 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
                 fontSize: '0.875rem',
                 color: 'var(--color-text-muted)'
               }}>
-                <Download size={14} /> {document.download_count}
+                <Download size={14} /> {doc.download_count}
               </span>
             )}
-            {document.file_url && (
+            {doc.file_url && (
               <a
-                href={document.file_url}
+                href={doc.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
@@ -309,7 +310,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
               fontSize: '0.9rem',
               color: 'var(--color-text)'
             }}>
-              {document.answer_key_text}
+              {doc.answer_key_text}
             </pre>
           </div>
         )}
@@ -327,7 +328,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
           </div>
         )}
 
-        {document.description && (
+        {doc.description && (
           <div style={{
             padding: '1rem 1.5rem',
             borderTop: '1px solid var(--color-border)',
@@ -338,7 +339,7 @@ const DocumentPreviewModal = ({ document, isOpen, onClose }) => {
               color: 'var(--color-text-muted)',
               lineHeight: '1.5'
             }}>
-              {document.description}
+              {doc.description}
             </p>
           </div>
         )}
