@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, User, LogOut, Upload, Moon, Sun, BarChart2, Menu, X, HandHelping, Bot, Users, Home } from 'lucide-react';
 import AuthModal from './AuthModal';
-import UploadModal from './UploadModal';
+import QuickAddModal from './QuickAddModal';
 import { supabase } from '../supabaseClient';
 import './Navbar.css';
 
@@ -197,10 +197,10 @@ const Navbar = () => {
         onLoginSuccess={handleAuthSuccess}
       />
 
-      <UploadModal 
+      <QuickAddModal 
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
-        onUploadSuccess={handleUploadSuccess}
+        onSuccess={handleUploadSuccess}
       />
     </>
   );
