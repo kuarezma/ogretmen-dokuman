@@ -1,7 +1,7 @@
 .doc-card {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 1rem 1rem 0.5rem 1rem;
   transition: transform var(--transition-bounce), box-shadow var(--transition-normal);
 }
 
