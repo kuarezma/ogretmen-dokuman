@@ -34,8 +34,7 @@ const INITIAL_FORM_DATA = {
   lesson: '',
   category: '',
   file_url: '',
-  type: 'pdf',
-  description: ''
+  type: 'pdf'
 };
 
 const inferFileType = (fileName = '') => {
@@ -143,7 +142,6 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           lesson: formData.lesson,
           category: formData.category,
           file_url: fileUrl,
-          description: formData.description || null,
           uploaded_by: uploaderName,
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
           created_at: new Date().toISOString(),
@@ -460,8 +458,8 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
               Açıklama
             </label>
             <textarea
-              name="description"
-              value={formData.description}
+              name="topic"
+              value={formData.topic}
               onChange={handleChange}
               placeholder="Belge hakkında ek bilgi (opsiyonel)"
               className="input-field"
