@@ -25,6 +25,7 @@ const CATEGORY_OPTIONS = [
   "Proje / Performans", "Zümre Tutanakları", "Etkinlik / Çalışma Kağıdı",
   "Sunum (Slayt)", "Diğer"
 ];
+const ACCEPTED_FILE_TYPES = '.pdf,.doc,.docx,.xls,.xlsx,.csv';
 
 const INITIAL_FORM_DATA = {
   title: '',
@@ -129,8 +130,8 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
         toast.success('Dosya yüklendi!', { id: 'upload' });
       }
 
-      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
       const resolvedType = file ? inferFileType(file.name) : formData.type;
+      const uploaderName = username || authUser.email?.split('@')[0] || 'Kullanıcı';
 
       const { data, error: insertError } = await supabase
         .from('documents')
@@ -143,7 +144,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
           category: formData.category,
           file_url: fileUrl,
           description: formData.description || null,
-          uploaded_by: username || currentUser?.username || authUser.email?.split('@')[0] || 'Kullanıcı',
+          uploaded_by: uploaderName,
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
           created_at: new Date().toISOString(),
           download_count: 0,
@@ -441,7 +442,7 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
                 <input 
                   type="file" 
                   onChange={handleFileChange}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv"
+                  accept={ACCEPTED_FILE_TYPES}
                   style={{ display: 'none' }} 
                 />
               </label>
