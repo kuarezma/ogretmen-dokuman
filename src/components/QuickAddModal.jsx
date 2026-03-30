@@ -104,10 +104,12 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
         .insert([{
           title: formData.title,
           topic: formData.topic || formData.title,
+          type: formData.type,
           grade: formData.grade,
           lesson: formData.lesson,
           category: formData.category,
           file_url: fileUrl,
+          description: formData.description || null,
           uploaded_by: currentUser?.username || 'Anonim',
           date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
           created_at: new Date().toISOString(),
@@ -412,6 +414,27 @@ const QuickAddModal = ({ isOpen, onClose, onSuccess }) => {
                 />
               </label>
             </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--color-text)'
+            }}>
+              Açıklama
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Belge hakkında ek bilgi (opsiyonel)"
+              className="input-field"
+              rows={3}
+              style={{ resize: 'vertical', minHeight: '80px' }}
+            />
           </div>
 
           <button
