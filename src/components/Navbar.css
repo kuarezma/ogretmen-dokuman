@@ -232,6 +232,21 @@
   }
 }
 
+@media (max-width: 340px) {
+  .brand h1 {
+    font-size: 0.8rem;
+  }
+  
+  .brand-icon {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .nav-container {
+    gap: 0.4rem;
+  }
+}
+
 @media (min-width: 769px) {
   .profile-mobile-btn {
     display: none;
