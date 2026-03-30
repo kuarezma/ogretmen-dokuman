@@ -177,10 +177,12 @@
 }
 
 .mobile-menu-panel .nav-badge-btn {
+  font-size: 0.84rem;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .mobile-menu-panel .btn {
+  font-size: 0.94rem;
   border-width: 1px;
 }
 
